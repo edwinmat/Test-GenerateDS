@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<StyledLayerDescriptor version="1.0.0"
+  xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd"
+  xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <NamedLayer>
+    <Name>Contingent style</Name>
+    <UserStyle>
+      <Title>0.0-0.2</Title>
+      <FeatureTypeStyle>
+        <Rule>
+          <Title>0.0-0.2</Title>
+
+          <ogc:Filter>
+            <ogc:PropertyIsLessThan>
+              <ogc:PropertyName>suitable</ogc:PropertyName>
+              <ogc:Literal>0.2</ogc:Literal>
+            </ogc:PropertyIsLessThan>
+          </ogc:Filter>
+
+          <PolygonSymbolizer>
+            <Fill>
+              <CssParameter name="fill">#f7fbff
+              </CssParameter>
+            </Fill>
+            <Stroke>
+              <CssParameter name="stroke">#000000</CssParameter>
+              <CssParameter name="stroke-width">0.5</CssParameter>
+            </Stroke>
+          </PolygonSymbolizer>
+        </Rule>
+
+        <Rule>
+          <Title>0.2-0.4</Title>
+
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>suitable</ogc:PropertyName>
+                <ogc:Literal>0.2</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+              <ogc:PropertyIsLessThan>
+                <ogc:PropertyName>suitable</ogc:PropertyName>
+                <ogc:Literal>0.4</ogc:Literal>
+              </ogc:PropertyIsLessThan>
+            </ogc:And>
+          </ogc:Filter>
+
+          <PolygonSymbolizer>
+            <Fill>
+              <CssParameter name="fill">#c8dcf0
+              </CssParameter>
+            </Fill>
+            <Stroke>
+              <CssParameter name="stroke">#000000</CssParameter>
+              <CssParameter name="stroke-width">0.5</CssParameter>
+            </Stroke>
+          </PolygonSymbolizer>
+        </Rule>
+
+        <Rule>
+          <Title>0.4-0.6</Title>
+
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>suitable</ogc:PropertyName>
+                <ogc:Literal>0.4</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+              <ogc:PropertyIsLessThan>
+                <ogc:PropertyName>suitable</ogc:PropertyName>
+                <ogc:Literal>0.6</ogc:Literal>
+              </ogc:PropertyIsLessThan>
+            </ogc:And>
+          </ogc:Filter>
+
+          <PolygonSymbolizer>
+            <Fill>
+              <CssParameter name="fill">#73b2d8
+              </CssParameter>
+            </Fill>
+            <Stroke>
+              <CssParameter name="stroke">#000000</CssParameter>
+              <CssParameter name="stroke-width">0.5</CssParameter>
+            </Stroke>
+          </PolygonSymbolizer>
+        </Rule>
+
+        <Rule>
+          <Title>0.6-0.8</Title>
+
+          <ogc:Filter>
+            <ogc:And>
+              <ogc:PropertyIsGreaterThanOrEqualTo>
+                <ogc:PropertyName>suitable</ogc:PropertyName>
+                <ogc:Literal>0.6</ogc:Literal>
+              </ogc:PropertyIsGreaterThanOrEqualTo>
+              <ogc:PropertyIsLessThan>
+                <ogc:PropertyName>suitable</ogc:PropertyName>
+                <ogc:Literal>0.8</ogc:Literal>
+              </ogc:PropertyIsLessThan>
+            </ogc:And>
+          </ogc:Filter>
+
+          <PolygonSymbolizer>
+            <Fill>
+              <CssParameter name="fill">#2979b9
+              </CssParameter>
+            </Fill>
+            <Stroke>
+              <CssParameter name="stroke">#000000</CssParameter>
+              <CssParameter name="stroke-width">0.5</CssParameter>
+            </Stroke>
+          </PolygonSymbolizer>
+        </Rule>
+
+        <Rule>
+          <Title>0.8-1.0</Title>
+
+          <ogc:Filter>
+		        <ogc:PropertyIsGreaterThan>
+			        <ogc:PropertyName>suitable</ogc:PropertyName>
+			        <ogc:Literal>0.8</ogc:Literal>
+			      </ogc:PropertyIsGreaterThan>
+          </ogc:Filter>
+
+          <PolygonSymbolizer>
+            <Fill>
+              <CssParameter name="fill">#08306b
+              </CssParameter>
+            </Fill>
+            <Stroke>
+              <CssParameter name="stroke">#000000</CssParameter>
+              <CssParameter name="stroke-width">0.5</CssParameter>
+            </Stroke>
+          </PolygonSymbolizer>
+        </Rule>
+
+      </FeatureTypeStyle>
+    </UserStyle>
+  </NamedLayer>
+</StyledLayerDescriptor>

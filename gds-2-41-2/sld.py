@@ -1,0 +1,18821 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#
+# Generated Wed Mar  1 10:32:35 2023 by generateDS.py version 2.41.2.
+# Python 3.10.10 (tags/v3.10.10:aad5f6a, Feb  7 2023, 17:20:36) [MSC v.1929 64 bit (AMD64)]
+#
+# Command line options:
+#   ('-m', '')
+#   ('-f', '')
+#   ('-o', 'sld.py')
+#   ('-s', 'sldsubs.py')
+#
+# Command line arguments:
+#   StyledLayerDescriptor.xsd
+#
+# Command line:
+#   C:\Users\matthijssenef\git\Test-GenerateDS\venv\Scripts\generateDS.py -m -f -o "sld.py" -s "sldsubs.py" StyledLayerDescriptor.xsd
+#
+# Current working directory (os.getcwd()):
+#   gds-2-41-2
+#
+
+import sys
+try:
+    ModulenotfoundExp_ = ModuleNotFoundError
+except NameError:
+    ModulenotfoundExp_ = ImportError
+from six.moves import zip_longest
+import os
+import re as re_
+import base64
+import datetime as datetime_
+import decimal as decimal_
+from lxml import etree as etree_
+
+
+Validate_simpletypes_ = True
+SaveElementTreeNode = True
+TagNamePrefix = ""
+if sys.version_info.major == 2:
+    BaseStrType_ = basestring
+else:
+    BaseStrType_ = str
+
+
+def parsexml_(infile, parser=None, **kwargs):
+    if parser is None:
+        # Use the lxml ElementTree compatible parser so that, e.g.,
+        #   we ignore comments.
+        try:
+            parser = etree_.ETCompatXMLParser()
+        except AttributeError:
+            # fallback to xml.etree
+            parser = etree_.XMLParser()
+    try:
+        if isinstance(infile, os.PathLike):
+            infile = os.path.join(infile)
+    except AttributeError:
+        pass
+    doc = etree_.parse(infile, parser=parser, **kwargs)
+    return doc
+
+def parsexmlstring_(instring, parser=None, **kwargs):
+    if parser is None:
+        # Use the lxml ElementTree compatible parser so that, e.g.,
+        #   we ignore comments.
+        try:
+            parser = etree_.ETCompatXMLParser()
+        except AttributeError:
+            # fallback to xml.etree
+            parser = etree_.XMLParser()
+    element = etree_.fromstring(instring, parser=parser, **kwargs)
+    return element
+
+#
+# Namespace prefix definition table (and other attributes, too)
+#
+# The module generatedsnamespaces, if it is importable, must contain
+# a dictionary named GeneratedsNamespaceDefs.  This Python dictionary
+# should map element type names (strings) to XML schema namespace prefix
+# definitions.  The export method for any class for which there is
+# a namespace prefix definition, will export that definition in the
+# XML representation of that element.  See the export method of
+# any generated element type class for an example of the use of this
+# table.
+# A sample table is:
+#
+#     # File: generatedsnamespaces.py
+#
+#     GenerateDSNamespaceDefs = {
+#         "ElementtypeA": "http://www.xxx.com/namespaceA",
+#         "ElementtypeB": "http://www.xxx.com/namespaceB",
+#     }
+#
+# Additionally, the generatedsnamespaces module can contain a python
+# dictionary named GenerateDSNamespaceTypePrefixes that associates element
+# types with the namespace prefixes that are to be added to the
+# "xsi:type" attribute value.  See the _exportAttributes method of
+# any generated element type and the generation of "xsi:type" for an
+# example of the use of this table.
+# An example table:
+#
+#     # File: generatedsnamespaces.py
+#
+#     GenerateDSNamespaceTypePrefixes = {
+#         "ElementtypeC": "aaa:",
+#         "ElementtypeD": "bbb:",
+#     }
+#
+
+try:
+    from generatedsnamespaces import GenerateDSNamespaceDefs as GenerateDSNamespaceDefs_
+except ModulenotfoundExp_ :
+    GenerateDSNamespaceDefs_ = {}
+try:
+    from generatedsnamespaces import GenerateDSNamespaceTypePrefixes as GenerateDSNamespaceTypePrefixes_
+except ModulenotfoundExp_ :
+    GenerateDSNamespaceTypePrefixes_ = {}
+
+#
+# You can replace the following class definition by defining an
+# importable module named "generatedscollector" containing a class
+# named "GdsCollector".  See the default class definition below for
+# clues about the possible content of that class.
+#
+try:
+    from generatedscollector import GdsCollector as GdsCollector_
+except ModulenotfoundExp_ :
+
+    class GdsCollector_(object):
+
+        def __init__(self, messages=None):
+            if messages is None:
+                self.messages = []
+            else:
+                self.messages = messages
+
+        def add_message(self, msg):
+            self.messages.append(msg)
+
+        def get_messages(self):
+            return self.messages
+
+        def clear_messages(self):
+            self.messages = []
+
+        def print_messages(self):
+            for msg in self.messages:
+                print("Warning: {}".format(msg))
+
+        def write_messages(self, outstream):
+            for msg in self.messages:
+                outstream.write("Warning: {}\n".format(msg))
+
+
+#
+# The super-class for enum types
+#
+
+try:
+    from enum import Enum
+except ModulenotfoundExp_ :
+    Enum = object
+
+#
+# The root super-class for element type classes
+#
+# Calls to the methods in these classes are generated by generateDS.py.
+# You can replace these methods by re-implementing the following class
+#   in a module named generatedssuper.py.
+
+try:
+    from generatedssuper import GeneratedsSuper
+except ModulenotfoundExp_ as exp:
+    try:
+        from generatedssupersuper import GeneratedsSuperSuper
+    except ModulenotfoundExp_ as exp:
+        class GeneratedsSuperSuper(object):
+            pass
+    
+    class GeneratedsSuper(GeneratedsSuperSuper):
+        __hash__ = object.__hash__
+        tzoff_pattern = re_.compile(r'(\+|-)((0\d|1[0-3]):[0-5]\d|14:00)$')
+        class _FixedOffsetTZ(datetime_.tzinfo):
+            def __init__(self, offset, name):
+                self.__offset = datetime_.timedelta(minutes=offset)
+                self.__name = name
+            def utcoffset(self, dt):
+                return self.__offset
+            def tzname(self, dt):
+                return self.__name
+            def dst(self, dt):
+                return None
+        def __str__(self):
+            settings = {
+                'str_pretty_print': True,
+                'str_indent_level': 0,
+                'str_namespaceprefix': '',
+                'str_name': self.__class__.__name__,
+                'str_namespacedefs': '',
+            }
+            for n in settings:
+                if hasattr(self, n):
+                    settings[n] = getattr(self, n)
+            if sys.version_info.major == 2:
+                from StringIO import StringIO
+            else:
+                from io import StringIO
+            output = StringIO()
+            self.export(
+                output,
+                settings['str_indent_level'],
+                pretty_print=settings['str_pretty_print'],
+                namespaceprefix_=settings['str_namespaceprefix'],
+                name_=settings['str_name'],
+                namespacedef_=settings['str_namespacedefs']
+            )
+            strval = output.getvalue()
+            output.close()
+            return strval
+        def gds_format_string(self, input_data, input_name=''):
+            return input_data
+        def gds_parse_string(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_validate_string(self, input_data, node=None, input_name=''):
+            if not input_data:
+                return ''
+            else:
+                return input_data
+        def gds_format_base64(self, input_data, input_name=''):
+            return base64.b64encode(input_data).decode('ascii')
+        def gds_validate_base64(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_format_integer(self, input_data, input_name=''):
+            return '%d' % int(input_data)
+        def gds_parse_integer(self, input_data, node=None, input_name=''):
+            try:
+                ival = int(input_data)
+            except (TypeError, ValueError) as exp:
+                raise_parse_error(node, 'Requires integer value: %s' % exp)
+            return ival
+        def gds_validate_integer(self, input_data, node=None, input_name=''):
+            try:
+                value = int(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires integer value')
+            return value
+        def gds_format_integer_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return '%s' % ' '.join(input_data)
+        def gds_validate_integer_list(
+                self, input_data, node=None, input_name=''):
+            values = input_data.split()
+            for value in values:
+                try:
+                    int(value)
+                except (TypeError, ValueError):
+                    raise_parse_error(node, 'Requires sequence of integer values')
+            return values
+        def gds_format_float(self, input_data, input_name=''):
+            return ('%.15f' % float(input_data)).rstrip('0')
+        def gds_parse_float(self, input_data, node=None, input_name=''):
+            try:
+                fval_ = float(input_data)
+            except (TypeError, ValueError) as exp:
+                raise_parse_error(node, 'Requires float or double value: %s' % exp)
+            return fval_
+        def gds_validate_float(self, input_data, node=None, input_name=''):
+            try:
+                value = float(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires float value')
+            return value
+        def gds_format_float_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return '%s' % ' '.join(input_data)
+        def gds_validate_float_list(
+                self, input_data, node=None, input_name=''):
+            values = input_data.split()
+            for value in values:
+                try:
+                    float(value)
+                except (TypeError, ValueError):
+                    raise_parse_error(node, 'Requires sequence of float values')
+            return values
+        def gds_format_decimal(self, input_data, input_name=''):
+            return_value = '%s' % input_data
+            if '.' in return_value:
+                return_value = return_value.rstrip('0')
+                if return_value.endswith('.'):
+                    return_value = return_value.rstrip('.')
+            return return_value
+        def gds_parse_decimal(self, input_data, node=None, input_name=''):
+            try:
+                decimal_value = decimal_.Decimal(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires decimal value')
+            return decimal_value
+        def gds_validate_decimal(self, input_data, node=None, input_name=''):
+            try:
+                value = decimal_.Decimal(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires decimal value')
+            return value
+        def gds_format_decimal_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return ' '.join([self.gds_format_decimal(item) for item in input_data])
+        def gds_validate_decimal_list(
+                self, input_data, node=None, input_name=''):
+            values = input_data.split()
+            for value in values:
+                try:
+                    decimal_.Decimal(value)
+                except (TypeError, ValueError):
+                    raise_parse_error(node, 'Requires sequence of decimal values')
+            return values
+        def gds_format_double(self, input_data, input_name=''):
+            return '%s' % input_data
+        def gds_parse_double(self, input_data, node=None, input_name=''):
+            try:
+                fval_ = float(input_data)
+            except (TypeError, ValueError) as exp:
+                raise_parse_error(node, 'Requires double or float value: %s' % exp)
+            return fval_
+        def gds_validate_double(self, input_data, node=None, input_name=''):
+            try:
+                value = float(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires double or float value')
+            return value
+        def gds_format_double_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return '%s' % ' '.join(input_data)
+        def gds_validate_double_list(
+                self, input_data, node=None, input_name=''):
+            values = input_data.split()
+            for value in values:
+                try:
+                    float(value)
+                except (TypeError, ValueError):
+                    raise_parse_error(
+                        node, 'Requires sequence of double or float values')
+            return values
+        def gds_format_boolean(self, input_data, input_name=''):
+            return ('%s' % input_data).lower()
+        def gds_parse_boolean(self, input_data, node=None, input_name=''):
+            input_data = input_data.strip()
+            if input_data in ('true', '1'):
+                bval = True
+            elif input_data in ('false', '0'):
+                bval = False
+            else:
+                raise_parse_error(node, 'Requires boolean value')
+            return bval
+        def gds_validate_boolean(self, input_data, node=None, input_name=''):
+            if input_data not in (True, 1, False, 0, ):
+                raise_parse_error(
+                    node,
+                    'Requires boolean value '
+                    '(one of True, 1, False, 0)')
+            return input_data
+        def gds_format_boolean_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return '%s' % ' '.join(input_data)
+        def gds_validate_boolean_list(
+                self, input_data, node=None, input_name=''):
+            values = input_data.split()
+            for value in values:
+                value = self.gds_parse_boolean(value, node, input_name)
+                if value not in (True, 1, False, 0, ):
+                    raise_parse_error(
+                        node,
+                        'Requires sequence of boolean values '
+                        '(one of True, 1, False, 0)')
+            return values
+        def gds_validate_datetime(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_format_datetime(self, input_data, input_name=''):
+            if input_data.microsecond == 0:
+                _svalue = '%04d-%02d-%02dT%02d:%02d:%02d' % (
+                    input_data.year,
+                    input_data.month,
+                    input_data.day,
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                )
+            else:
+                _svalue = '%04d-%02d-%02dT%02d:%02d:%02d.%s' % (
+                    input_data.year,
+                    input_data.month,
+                    input_data.day,
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                    ('%f' % (float(input_data.microsecond) / 1000000))[2:],
+                )
+            if input_data.tzinfo is not None:
+                tzoff = input_data.tzinfo.utcoffset(input_data)
+                if tzoff is not None:
+                    total_seconds = tzoff.seconds + (86400 * tzoff.days)
+                    if total_seconds == 0:
+                        _svalue += 'Z'
+                    else:
+                        if total_seconds < 0:
+                            _svalue += '-'
+                            total_seconds *= -1
+                        else:
+                            _svalue += '+'
+                        hours = total_seconds // 3600
+                        minutes = (total_seconds - (hours * 3600)) // 60
+                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+            return _svalue
+        @classmethod
+        def gds_parse_datetime(cls, input_data):
+            tz = None
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+                input_data = input_data[:-1]
+            else:
+                results = GeneratedsSuper.tzoff_pattern.search(input_data)
+                if results is not None:
+                    tzoff_parts = results.group(2).split(':')
+                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
+                    if results.group(1) == '-':
+                        tzoff *= -1
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
+                    input_data = input_data[:-6]
+            time_parts = input_data.split('.')
+            if len(time_parts) > 1:
+                micro_seconds = int(float('0.' + time_parts[1]) * 1000000)
+                input_data = '%s.%s' % (
+                    time_parts[0], "{}".format(micro_seconds).rjust(6, "0"), )
+                dt = datetime_.datetime.strptime(
+                    input_data, '%Y-%m-%dT%H:%M:%S.%f')
+            else:
+                dt = datetime_.datetime.strptime(
+                    input_data, '%Y-%m-%dT%H:%M:%S')
+            dt = dt.replace(tzinfo=tz)
+            return dt
+        def gds_validate_date(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_format_date(self, input_data, input_name=''):
+            _svalue = '%04d-%02d-%02d' % (
+                input_data.year,
+                input_data.month,
+                input_data.day,
+            )
+            try:
+                if input_data.tzinfo is not None:
+                    tzoff = input_data.tzinfo.utcoffset(input_data)
+                    if tzoff is not None:
+                        total_seconds = tzoff.seconds + (86400 * tzoff.days)
+                        if total_seconds == 0:
+                            _svalue += 'Z'
+                        else:
+                            if total_seconds < 0:
+                                _svalue += '-'
+                                total_seconds *= -1
+                            else:
+                                _svalue += '+'
+                            hours = total_seconds // 3600
+                            minutes = (total_seconds - (hours * 3600)) // 60
+                            _svalue += '{0:02d}:{1:02d}'.format(
+                                hours, minutes)
+            except AttributeError:
+                pass
+            return _svalue
+        @classmethod
+        def gds_parse_date(cls, input_data):
+            tz = None
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+                input_data = input_data[:-1]
+            else:
+                results = GeneratedsSuper.tzoff_pattern.search(input_data)
+                if results is not None:
+                    tzoff_parts = results.group(2).split(':')
+                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
+                    if results.group(1) == '-':
+                        tzoff *= -1
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
+                    input_data = input_data[:-6]
+            dt = datetime_.datetime.strptime(input_data, '%Y-%m-%d')
+            dt = dt.replace(tzinfo=tz)
+            return dt.date()
+        def gds_validate_time(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_format_time(self, input_data, input_name=''):
+            if input_data.microsecond == 0:
+                _svalue = '%02d:%02d:%02d' % (
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                )
+            else:
+                _svalue = '%02d:%02d:%02d.%s' % (
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                    ('%f' % (float(input_data.microsecond) / 1000000))[2:],
+                )
+            if input_data.tzinfo is not None:
+                tzoff = input_data.tzinfo.utcoffset(input_data)
+                if tzoff is not None:
+                    total_seconds = tzoff.seconds + (86400 * tzoff.days)
+                    if total_seconds == 0:
+                        _svalue += 'Z'
+                    else:
+                        if total_seconds < 0:
+                            _svalue += '-'
+                            total_seconds *= -1
+                        else:
+                            _svalue += '+'
+                        hours = total_seconds // 3600
+                        minutes = (total_seconds - (hours * 3600)) // 60
+                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+            return _svalue
+        def gds_validate_simple_patterns(self, patterns, target):
+            # pat is a list of lists of strings/patterns.
+            # The target value must match at least one of the patterns
+            # in order for the test to succeed.
+            found1 = True
+            target = str(target)
+            for patterns1 in patterns:
+                found2 = False
+                for patterns2 in patterns1:
+                    mo = re_.search(patterns2, target)
+                    if mo is not None and len(mo.group(0)) == len(target):
+                        found2 = True
+                        break
+                if not found2:
+                    found1 = False
+                    break
+            return found1
+        @classmethod
+        def gds_parse_time(cls, input_data):
+            tz = None
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+                input_data = input_data[:-1]
+            else:
+                results = GeneratedsSuper.tzoff_pattern.search(input_data)
+                if results is not None:
+                    tzoff_parts = results.group(2).split(':')
+                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
+                    if results.group(1) == '-':
+                        tzoff *= -1
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
+                    input_data = input_data[:-6]
+            if len(input_data.split('.')) > 1:
+                dt = datetime_.datetime.strptime(input_data, '%H:%M:%S.%f')
+            else:
+                dt = datetime_.datetime.strptime(input_data, '%H:%M:%S')
+            dt = dt.replace(tzinfo=tz)
+            return dt.time()
+        def gds_check_cardinality_(
+                self, value, input_name,
+                min_occurs=0, max_occurs=1, required=None):
+            if value is None:
+                length = 0
+            elif isinstance(value, list):
+                length = len(value)
+            else:
+                length = 1
+            if required is not None :
+                if required and length < 1:
+                    self.gds_collector_.add_message(
+                        "Required value {}{} is missing".format(
+                            input_name, self.gds_get_node_lineno_()))
+            if length < min_occurs:
+                self.gds_collector_.add_message(
+                    "Number of values for {}{} is below "
+                    "the minimum allowed, "
+                    "expected at least {}, found {}".format(
+                        input_name, self.gds_get_node_lineno_(),
+                        min_occurs, length))
+            elif length > max_occurs:
+                self.gds_collector_.add_message(
+                    "Number of values for {}{} is above "
+                    "the maximum allowed, "
+                    "expected at most {}, found {}".format(
+                        input_name, self.gds_get_node_lineno_(),
+                        max_occurs, length))
+        def gds_validate_builtin_ST_(
+                self, validator, value, input_name,
+                min_occurs=None, max_occurs=None, required=None):
+            if value is not None:
+                try:
+                    validator(value, input_name=input_name)
+                except GDSParseError as parse_error:
+                    self.gds_collector_.add_message(str(parse_error))
+        def gds_validate_defined_ST_(
+                self, validator, value, input_name,
+                min_occurs=None, max_occurs=None, required=None):
+            if value is not None:
+                try:
+                    validator(value)
+                except GDSParseError as parse_error:
+                    self.gds_collector_.add_message(str(parse_error))
+        def gds_str_lower(self, instring):
+            return instring.lower()
+        def get_path_(self, node):
+            path_list = []
+            self.get_path_list_(node, path_list)
+            path_list.reverse()
+            path = '/'.join(path_list)
+            return path
+        Tag_strip_pattern_ = re_.compile(r'\{.*\}')
+        def get_path_list_(self, node, path_list):
+            if node is None:
+                return
+            tag = GeneratedsSuper.Tag_strip_pattern_.sub('', node.tag)
+            if tag:
+                path_list.append(tag)
+            self.get_path_list_(node.getparent(), path_list)
+        def get_class_obj_(self, node, default_class=None):
+            class_obj1 = default_class
+            if 'xsi' in node.nsmap:
+                classname = node.get('{%s}type' % node.nsmap['xsi'])
+                if classname is not None:
+                    names = classname.split(':')
+                    if len(names) == 2:
+                        classname = names[1]
+                    class_obj2 = globals().get(classname)
+                    if class_obj2 is not None:
+                        class_obj1 = class_obj2
+            return class_obj1
+        def gds_build_any(self, node, type_name=None):
+            # provide default value in case option --disable-xml is used.
+            content = ""
+            content = etree_.tostring(node, encoding="unicode")
+            return content
+        @classmethod
+        def gds_reverse_node_mapping(cls, mapping):
+            return dict(((v, k) for k, v in mapping.items()))
+        @staticmethod
+        def gds_encode(instring):
+            if sys.version_info.major == 2:
+                if ExternalEncoding:
+                    encoding = ExternalEncoding
+                else:
+                    encoding = 'utf-8'
+                return instring.encode(encoding)
+            else:
+                return instring
+        @staticmethod
+        def convert_unicode(instring):
+            if isinstance(instring, str):
+                result = quote_xml(instring)
+            elif sys.version_info.major == 2 and isinstance(instring, unicode):
+                result = quote_xml(instring).encode('utf8')
+            else:
+                result = GeneratedsSuper.gds_encode(str(instring))
+            return result
+        def __eq__(self, other):
+            def excl_select_objs_(obj):
+                return (obj[0] != 'parent_object_' and
+                        obj[0] != 'gds_collector_')
+            if type(self) != type(other):
+                return False
+            return all(x == y for x, y in zip_longest(
+                filter(excl_select_objs_, self.__dict__.items()),
+                filter(excl_select_objs_, other.__dict__.items())))
+        def __ne__(self, other):
+            return not self.__eq__(other)
+        # Django ETL transform hooks.
+        def gds_djo_etl_transform(self):
+            pass
+        def gds_djo_etl_transform_db_obj(self, dbobj):
+            pass
+        # SQLAlchemy ETL transform hooks.
+        def gds_sqa_etl_transform(self):
+            return 0, None
+        def gds_sqa_etl_transform_db_obj(self, dbobj):
+            pass
+        def gds_get_node_lineno_(self):
+            if (hasattr(self, "gds_elementtree_node_") and
+                    self.gds_elementtree_node_ is not None):
+                return ' near line {}'.format(
+                    self.gds_elementtree_node_.sourceline)
+            else:
+                return ""
+    
+    
+    def getSubclassFromModule_(module, class_):
+        '''Get the subclass of a class from a specific module.'''
+        name = class_.__name__ + 'Sub'
+        if hasattr(module, name):
+            return getattr(module, name)
+        else:
+            return None
+
+
+#
+# If you have installed IPython you can uncomment and use the following.
+# IPython is available from http://ipython.scipy.org/.
+#
+
+## from IPython.Shell import IPShellEmbed
+## args = ''
+## ipshell = IPShellEmbed(args,
+##     banner = 'Dropping into IPython',
+##     exit_msg = 'Leaving Interpreter, back to program.')
+
+# Then use the following line where and when you want to drop into the
+# IPython shell:
+#    ipshell('<some message> -- Entering ipshell.\nHit Ctrl-D to exit')
+
+#
+# Globals
+#
+
+ExternalEncoding = ''
+# Set this to false in order to deactivate during export, the use of
+# name space prefixes captured from the input document.
+UseCapturedNS_ = True
+CapturedNsmap_ = {}
+Tag_pattern_ = re_.compile(r'({.*})?(.*)')
+String_cleanup_pat_ = re_.compile(r"[\n\r\s]+")
+Namespace_extract_pat_ = re_.compile(r'{(.*)}(.*)')
+CDATA_pattern_ = re_.compile(r"<!\[CDATA\[.*?\]\]>", re_.DOTALL)
+
+# Change this to redirect the generated superclass module to use a
+# specific subclass module.
+CurrentSubclassModule_ = None
+
+#
+# Support/utility functions.
+#
+
+
+def showIndent(outfile, level, pretty_print=True):
+    if pretty_print:
+        for idx in range(level):
+            outfile.write('    ')
+
+
+def quote_xml(inStr):
+    "Escape markup chars, but do not modify CDATA sections."
+    if not inStr:
+        return ''
+    s1 = (isinstance(inStr, BaseStrType_) and inStr or '%s' % inStr)
+    s2 = ''
+    pos = 0
+    matchobjects = CDATA_pattern_.finditer(s1)
+    for mo in matchobjects:
+        s3 = s1[pos:mo.start()]
+        s2 += quote_xml_aux(s3)
+        s2 += s1[mo.start():mo.end()]
+        pos = mo.end()
+    s3 = s1[pos:]
+    s2 += quote_xml_aux(s3)
+    return s2
+
+
+def quote_xml_aux(inStr):
+    s1 = inStr.replace('&', '&amp;')
+    s1 = s1.replace('<', '&lt;')
+    s1 = s1.replace('>', '&gt;')
+    return s1
+
+
+def quote_attrib(inStr):
+    s1 = (isinstance(inStr, BaseStrType_) and inStr or '%s' % inStr)
+    s1 = s1.replace('&', '&amp;')
+    s1 = s1.replace('<', '&lt;')
+    s1 = s1.replace('>', '&gt;')
+    s1 = s1.replace('\n', '&#10;')
+    if '"' in s1:
+        if "'" in s1:
+            s1 = '"%s"' % s1.replace('"', "&quot;")
+        else:
+            s1 = "'%s'" % s1
+    else:
+        s1 = '"%s"' % s1
+    return s1
+
+
+def quote_python(inStr):
+    s1 = inStr
+    if s1.find("'") == -1:
+        if s1.find('\n') == -1:
+            return "'%s'" % s1
+        else:
+            return "'''%s'''" % s1
+    else:
+        if s1.find('"') != -1:
+            s1 = s1.replace('"', '\\"')
+        if s1.find('\n') == -1:
+            return '"%s"' % s1
+        else:
+            return '"""%s"""' % s1
+
+
+def get_all_text_(node):
+    if node.text is not None:
+        text = node.text
+    else:
+        text = ''
+    for child in node:
+        if child.tail is not None:
+            text += child.tail
+    return text
+
+
+def find_attr_value_(attr_name, node):
+    attrs = node.attrib
+    attr_parts = attr_name.split(':')
+    value = None
+    if len(attr_parts) == 1:
+        value = attrs.get(attr_name)
+    elif len(attr_parts) == 2:
+        prefix, name = attr_parts
+        if prefix == 'xml':
+            namespace = 'http://www.w3.org/XML/1998/namespace'
+        else:
+            namespace = node.nsmap.get(prefix)
+        if namespace is not None:
+            value = attrs.get('{%s}%s' % (namespace, name, ))
+    return value
+
+
+def encode_str_2_3(instr):
+    return instr
+
+
+class GDSParseError(Exception):
+    pass
+
+
+def raise_parse_error(node, msg):
+    if node is not None:
+        msg = '%s (element %s/line %d)' % (msg, node.tag, node.sourceline, )
+    raise GDSParseError(msg)
+
+
+class MixedContainer:
+    # Constants for category:
+    CategoryNone = 0
+    CategoryText = 1
+    CategorySimple = 2
+    CategoryComplex = 3
+    # Constants for content_type:
+    TypeNone = 0
+    TypeText = 1
+    TypeString = 2
+    TypeInteger = 3
+    TypeFloat = 4
+    TypeDecimal = 5
+    TypeDouble = 6
+    TypeBoolean = 7
+    TypeBase64 = 8
+    def __init__(self, category, content_type, name, value):
+        self.category = category
+        self.content_type = content_type
+        self.name = name
+        self.value = value
+    def getCategory(self):
+        return self.category
+    def getContenttype(self, content_type):
+        return self.content_type
+    def getValue(self):
+        return self.value
+    def getName(self):
+        return self.name
+    def export(self, outfile, level, name, namespace,
+               pretty_print=True):
+        if self.category == MixedContainer.CategoryText:
+            # Prevent exporting empty content as empty lines.
+            if self.value.strip():
+                outfile.write(self.value)
+        elif self.category == MixedContainer.CategorySimple:
+            self.exportSimple(outfile, level, name)
+        else:    # category == MixedContainer.CategoryComplex
+            self.value.export(
+                outfile, level, namespace, name_=name,
+                pretty_print=pretty_print)
+    def exportSimple(self, outfile, level, name):
+        if self.content_type == MixedContainer.TypeString:
+            outfile.write('<%s>%s</%s>' % (
+                self.name, self.value, self.name))
+        elif self.content_type == MixedContainer.TypeInteger or \
+                self.content_type == MixedContainer.TypeBoolean:
+            outfile.write('<%s>%d</%s>' % (
+                self.name, self.value, self.name))
+        elif self.content_type == MixedContainer.TypeFloat or \
+                self.content_type == MixedContainer.TypeDecimal:
+            outfile.write('<%s>%f</%s>' % (
+                self.name, self.value, self.name))
+        elif self.content_type == MixedContainer.TypeDouble:
+            outfile.write('<%s>%g</%s>' % (
+                self.name, self.value, self.name))
+        elif self.content_type == MixedContainer.TypeBase64:
+            outfile.write('<%s>%s</%s>' % (
+                self.name,
+                base64.b64encode(self.value),
+                self.name))
+    def to_etree(self, element, mapping_=None, reverse_mapping_=None, nsmap_=None):
+        if self.category == MixedContainer.CategoryText:
+            # Prevent exporting empty content as empty lines.
+            if self.value.strip():
+                if len(element) > 0:
+                    if element[-1].tail is None:
+                        element[-1].tail = self.value
+                    else:
+                        element[-1].tail += self.value
+                else:
+                    if element.text is None:
+                        element.text = self.value
+                    else:
+                        element.text += self.value
+        elif self.category == MixedContainer.CategorySimple:
+            subelement = etree_.SubElement(
+                element, '%s' % self.name)
+            subelement.text = self.to_etree_simple()
+        else:    # category == MixedContainer.CategoryComplex
+            self.value.to_etree(element)
+    def to_etree_simple(self, mapping_=None, reverse_mapping_=None, nsmap_=None):
+        if self.content_type == MixedContainer.TypeString:
+            text = self.value
+        elif (self.content_type == MixedContainer.TypeInteger or
+                self.content_type == MixedContainer.TypeBoolean):
+            text = '%d' % self.value
+        elif (self.content_type == MixedContainer.TypeFloat or
+                self.content_type == MixedContainer.TypeDecimal):
+            text = '%f' % self.value
+        elif self.content_type == MixedContainer.TypeDouble:
+            text = '%g' % self.value
+        elif self.content_type == MixedContainer.TypeBase64:
+            text = '%s' % base64.b64encode(self.value)
+        return text
+    def exportLiteral(self, outfile, level, name):
+        if self.category == MixedContainer.CategoryText:
+            showIndent(outfile, level)
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s", "%s"),\n' % (
+                    self.category, self.content_type,
+                    self.name, self.value))
+        elif self.category == MixedContainer.CategorySimple:
+            showIndent(outfile, level)
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s", "%s"),\n' % (
+                    self.category, self.content_type,
+                    self.name, self.value))
+        else:    # category == MixedContainer.CategoryComplex
+            showIndent(outfile, level)
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s",\n' % (
+                    self.category, self.content_type, self.name,))
+            self.value.exportLiteral(outfile, level + 1)
+            showIndent(outfile, level)
+            outfile.write(')\n')
+
+
+class MemberSpec_(object):
+    def __init__(self, name='', data_type='', container=0,
+            optional=0, child_attrs=None, choice=None):
+        self.name = name
+        self.data_type = data_type
+        self.container = container
+        self.child_attrs = child_attrs
+        self.choice = choice
+        self.optional = optional
+    def set_name(self, name): self.name = name
+    def get_name(self): return self.name
+    def set_data_type(self, data_type): self.data_type = data_type
+    def get_data_type_chain(self): return self.data_type
+    def get_data_type(self):
+        if isinstance(self.data_type, list):
+            if len(self.data_type) > 0:
+                return self.data_type[-1]
+            else:
+                return 'xs:string'
+        else:
+            return self.data_type
+    def set_container(self, container): self.container = container
+    def get_container(self): return self.container
+    def set_child_attrs(self, child_attrs): self.child_attrs = child_attrs
+    def get_child_attrs(self): return self.child_attrs
+    def set_choice(self, choice): self.choice = choice
+    def get_choice(self): return self.choice
+    def set_optional(self, optional): self.optional = optional
+    def get_optional(self): return self.optional
+
+
+def _cast(typ, value):
+    if typ is None or value is None:
+        return value
+    return typ(value)
+
+#
+# Data representation classes.
+#
+
+
+class NullType(str, Enum):
+    """NullType --
+    If a bounding shape is not provided for a feature collection,
+    explain why. Allowable values are:
+    innapplicable - the features do not have geometry
+    unknown - the boundingBox cannot be computed
+    unavailable - there may be a boundingBox but it is not divulged
+    missing - there are no features
+    
+    """
+    INAPPLICABLE='inapplicable'
+    UNKNOWN='unknown'
+    UNAVAILABLE='unavailable'
+    MISSING='missing'
+
+
+class actuateType(str, Enum):
+    ON_LOAD='onLoad'
+    ON_REQUEST='onRequest'
+    OTHER='other'
+    NONE='none'
+
+
+class showType(str, Enum):
+    NEW='new'
+    REPLACE='replace'
+    EMBED='embed'
+    OTHER='other'
+    NONE='none'
+
+
+class typeType(str, Enum):
+    SIMPLE='simple'
+    EXTENDED='extended'
+    TITLE='title'
+    RESOURCE='resource'
+    LOCATOR='locator'
+    ARC='arc'
+
+
+class StyledLayerDescriptor(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, version='1.0.0', Name=None, Title=None, Abstract=None, NamedLayer=None, UserLayer=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.version = _cast(None, version)
+        self.version_nsprefix_ = None
+        self.Name = Name
+        self.Name_nsprefix_ = "sld"
+        self.Title = Title
+        self.Title_nsprefix_ = "sld"
+        self.Abstract = Abstract
+        self.Abstract_nsprefix_ = "sld"
+        if NamedLayer is None:
+            self.NamedLayer = []
+        else:
+            self.NamedLayer = NamedLayer
+        self.NamedLayer_nsprefix_ = "sld"
+        if UserLayer is None:
+            self.UserLayer = []
+        else:
+            self.UserLayer = UserLayer
+        self.UserLayer_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, StyledLayerDescriptor)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if StyledLayerDescriptor.subclass:
+            return StyledLayerDescriptor.subclass(*args_, **kwargs_)
+        else:
+            return StyledLayerDescriptor(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Name(self):
+        return self.Name
+    def set_Name(self, Name):
+        self.Name = Name
+    NameProp = property(get_Name, set_Name)
+    def get_Title(self):
+        return self.Title
+    def set_Title(self, Title):
+        self.Title = Title
+    TitleProp = property(get_Title, set_Title)
+    def get_Abstract(self):
+        return self.Abstract
+    def set_Abstract(self, Abstract):
+        self.Abstract = Abstract
+    AbstractProp = property(get_Abstract, set_Abstract)
+    def get_NamedLayer(self):
+        return self.NamedLayer
+    def set_NamedLayer(self, NamedLayer):
+        self.NamedLayer = NamedLayer
+    def add_NamedLayer(self, value):
+        self.NamedLayer.append(value)
+    def insert_NamedLayer_at(self, index, value):
+        self.NamedLayer.insert(index, value)
+    def replace_NamedLayer_at(self, index, value):
+        self.NamedLayer[index] = value
+    NamedLayerProp = property(get_NamedLayer, set_NamedLayer)
+    def get_UserLayer(self):
+        return self.UserLayer
+    def set_UserLayer(self, UserLayer):
+        self.UserLayer = UserLayer
+    def add_UserLayer(self, value):
+        self.UserLayer.append(value)
+    def insert_UserLayer_at(self, index, value):
+        self.UserLayer.insert(index, value)
+    def replace_UserLayer_at(self, index, value):
+        self.UserLayer[index] = value
+    UserLayerProp = property(get_UserLayer, set_UserLayer)
+    def get_version(self):
+        return self.version
+    def set_version(self, version):
+        self.version = version
+    versionProp = property(get_version, set_version)
+    def _hasContent(self):
+        if (
+            self.Name is not None or
+            self.Title is not None or
+            self.Abstract is not None or
+            self.NamedLayer or
+            self.UserLayer
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='StyledLayerDescriptor', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('StyledLayerDescriptor')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'StyledLayerDescriptor':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='StyledLayerDescriptor')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='StyledLayerDescriptor', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='StyledLayerDescriptor'):
+        if self.version is not None and 'version' not in already_processed:
+            already_processed.add('version')
+            outfile.write(' version=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.version), input_name='version')), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='StyledLayerDescriptor', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Name is not None:
+            namespaceprefix_ = self.Name_nsprefix_ + ':' if (UseCapturedNS_ and self.Name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sName>%s</%sName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Name), input_name='Name')), namespaceprefix_ , eol_))
+        if self.Title is not None:
+            namespaceprefix_ = self.Title_nsprefix_ + ':' if (UseCapturedNS_ and self.Title_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTitle>%s</%sTitle>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Title), input_name='Title')), namespaceprefix_ , eol_))
+        if self.Abstract is not None:
+            namespaceprefix_ = self.Abstract_nsprefix_ + ':' if (UseCapturedNS_ and self.Abstract_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sAbstract>%s</%sAbstract>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Abstract), input_name='Abstract')), namespaceprefix_ , eol_))
+        for NamedLayer_ in self.NamedLayer:
+            namespaceprefix_ = self.NamedLayer_nsprefix_ + ':' if (UseCapturedNS_ and self.NamedLayer_nsprefix_) else ''
+            NamedLayer_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='NamedLayer', pretty_print=pretty_print)
+        for UserLayer_ in self.UserLayer:
+            namespaceprefix_ = self.UserLayer_nsprefix_ + ':' if (UseCapturedNS_ and self.UserLayer_nsprefix_) else ''
+            UserLayer_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='UserLayer', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('version', node)
+        if value is not None and 'version' not in already_processed:
+            already_processed.add('version')
+            self.version = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Name')
+            value_ = self.gds_validate_string(value_, node, 'Name')
+            self.Name = value_
+            self.Name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Title':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Title')
+            value_ = self.gds_validate_string(value_, node, 'Title')
+            self.Title = value_
+            self.Title_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Abstract':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Abstract')
+            value_ = self.gds_validate_string(value_, node, 'Abstract')
+            self.Abstract = value_
+            self.Abstract_nsprefix_ = child_.prefix
+        elif nodeName_ == 'NamedLayer':
+            obj_ = NamedLayer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.NamedLayer.append(obj_)
+            obj_.original_tagname_ = 'NamedLayer'
+        elif nodeName_ == 'UserLayer':
+            obj_ = UserLayer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserLayer.append(obj_)
+            obj_.original_tagname_ = 'UserLayer'
+# end class StyledLayerDescriptor
+
+
+class NamedLayer(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Name=None, LayerFeatureConstraints=None, NamedStyle=None, UserStyle=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Name = Name
+        self.Name_nsprefix_ = "sld"
+        self.LayerFeatureConstraints = LayerFeatureConstraints
+        self.LayerFeatureConstraints_nsprefix_ = "sld"
+        if NamedStyle is None:
+            self.NamedStyle = []
+        else:
+            self.NamedStyle = NamedStyle
+        self.NamedStyle_nsprefix_ = "sld"
+        if UserStyle is None:
+            self.UserStyle = []
+        else:
+            self.UserStyle = UserStyle
+        self.UserStyle_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, NamedLayer)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if NamedLayer.subclass:
+            return NamedLayer.subclass(*args_, **kwargs_)
+        else:
+            return NamedLayer(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Name(self):
+        return self.Name
+    def set_Name(self, Name):
+        self.Name = Name
+    NameProp = property(get_Name, set_Name)
+    def get_LayerFeatureConstraints(self):
+        return self.LayerFeatureConstraints
+    def set_LayerFeatureConstraints(self, LayerFeatureConstraints):
+        self.LayerFeatureConstraints = LayerFeatureConstraints
+    LayerFeatureConstraintsProp = property(get_LayerFeatureConstraints, set_LayerFeatureConstraints)
+    def get_NamedStyle(self):
+        return self.NamedStyle
+    def set_NamedStyle(self, NamedStyle):
+        self.NamedStyle = NamedStyle
+    def add_NamedStyle(self, value):
+        self.NamedStyle.append(value)
+    def insert_NamedStyle_at(self, index, value):
+        self.NamedStyle.insert(index, value)
+    def replace_NamedStyle_at(self, index, value):
+        self.NamedStyle[index] = value
+    NamedStyleProp = property(get_NamedStyle, set_NamedStyle)
+    def get_UserStyle(self):
+        return self.UserStyle
+    def set_UserStyle(self, UserStyle):
+        self.UserStyle = UserStyle
+    def add_UserStyle(self, value):
+        self.UserStyle.append(value)
+    def insert_UserStyle_at(self, index, value):
+        self.UserStyle.insert(index, value)
+    def replace_UserStyle_at(self, index, value):
+        self.UserStyle[index] = value
+    UserStyleProp = property(get_UserStyle, set_UserStyle)
+    def _hasContent(self):
+        if (
+            self.Name is not None or
+            self.LayerFeatureConstraints is not None or
+            self.NamedStyle or
+            self.UserStyle
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='NamedLayer', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('NamedLayer')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'NamedLayer':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='NamedLayer')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='NamedLayer', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='NamedLayer'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='NamedLayer', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Name is not None:
+            namespaceprefix_ = self.Name_nsprefix_ + ':' if (UseCapturedNS_ and self.Name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sName>%s</%sName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Name), input_name='Name')), namespaceprefix_ , eol_))
+        if self.LayerFeatureConstraints is not None:
+            namespaceprefix_ = self.LayerFeatureConstraints_nsprefix_ + ':' if (UseCapturedNS_ and self.LayerFeatureConstraints_nsprefix_) else ''
+            self.LayerFeatureConstraints.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='LayerFeatureConstraints', pretty_print=pretty_print)
+        for NamedStyle_ in self.NamedStyle:
+            namespaceprefix_ = self.NamedStyle_nsprefix_ + ':' if (UseCapturedNS_ and self.NamedStyle_nsprefix_) else ''
+            NamedStyle_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='NamedStyle', pretty_print=pretty_print)
+        for UserStyle_ in self.UserStyle:
+            namespaceprefix_ = self.UserStyle_nsprefix_ + ':' if (UseCapturedNS_ and self.UserStyle_nsprefix_) else ''
+            UserStyle_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='UserStyle', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Name')
+            value_ = self.gds_validate_string(value_, node, 'Name')
+            self.Name = value_
+            self.Name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'LayerFeatureConstraints':
+            obj_ = LayerFeatureConstraints.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LayerFeatureConstraints = obj_
+            obj_.original_tagname_ = 'LayerFeatureConstraints'
+        elif nodeName_ == 'NamedStyle':
+            obj_ = NamedStyle.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.NamedStyle.append(obj_)
+            obj_.original_tagname_ = 'NamedStyle'
+        elif nodeName_ == 'UserStyle':
+            obj_ = UserStyle.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserStyle.append(obj_)
+            obj_.original_tagname_ = 'UserStyle'
+# end class NamedLayer
+
+
+class NamedStyle(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Name=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Name = Name
+        self.Name_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, NamedStyle)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if NamedStyle.subclass:
+            return NamedStyle.subclass(*args_, **kwargs_)
+        else:
+            return NamedStyle(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Name(self):
+        return self.Name
+    def set_Name(self, Name):
+        self.Name = Name
+    NameProp = property(get_Name, set_Name)
+    def _hasContent(self):
+        if (
+            self.Name is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='NamedStyle', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('NamedStyle')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'NamedStyle':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='NamedStyle')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='NamedStyle', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='NamedStyle'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='NamedStyle', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Name is not None:
+            namespaceprefix_ = self.Name_nsprefix_ + ':' if (UseCapturedNS_ and self.Name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sName>%s</%sName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Name), input_name='Name')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Name')
+            value_ = self.gds_validate_string(value_, node, 'Name')
+            self.Name = value_
+            self.Name_nsprefix_ = child_.prefix
+# end class NamedStyle
+
+
+class UserLayer(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Name=None, RemoteOWS=None, LayerFeatureConstraints=None, UserStyle=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Name = Name
+        self.Name_nsprefix_ = "sld"
+        self.RemoteOWS = RemoteOWS
+        self.RemoteOWS_nsprefix_ = "sld"
+        self.LayerFeatureConstraints = LayerFeatureConstraints
+        self.LayerFeatureConstraints_nsprefix_ = "sld"
+        if UserStyle is None:
+            self.UserStyle = []
+        else:
+            self.UserStyle = UserStyle
+        self.UserStyle_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, UserLayer)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if UserLayer.subclass:
+            return UserLayer.subclass(*args_, **kwargs_)
+        else:
+            return UserLayer(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Name(self):
+        return self.Name
+    def set_Name(self, Name):
+        self.Name = Name
+    NameProp = property(get_Name, set_Name)
+    def get_RemoteOWS(self):
+        return self.RemoteOWS
+    def set_RemoteOWS(self, RemoteOWS):
+        self.RemoteOWS = RemoteOWS
+    RemoteOWSProp = property(get_RemoteOWS, set_RemoteOWS)
+    def get_LayerFeatureConstraints(self):
+        return self.LayerFeatureConstraints
+    def set_LayerFeatureConstraints(self, LayerFeatureConstraints):
+        self.LayerFeatureConstraints = LayerFeatureConstraints
+    LayerFeatureConstraintsProp = property(get_LayerFeatureConstraints, set_LayerFeatureConstraints)
+    def get_UserStyle(self):
+        return self.UserStyle
+    def set_UserStyle(self, UserStyle):
+        self.UserStyle = UserStyle
+    def add_UserStyle(self, value):
+        self.UserStyle.append(value)
+    def insert_UserStyle_at(self, index, value):
+        self.UserStyle.insert(index, value)
+    def replace_UserStyle_at(self, index, value):
+        self.UserStyle[index] = value
+    UserStyleProp = property(get_UserStyle, set_UserStyle)
+    def _hasContent(self):
+        if (
+            self.Name is not None or
+            self.RemoteOWS is not None or
+            self.LayerFeatureConstraints is not None or
+            self.UserStyle
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='UserLayer', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('UserLayer')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'UserLayer':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='UserLayer')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='UserLayer', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='UserLayer'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='UserLayer', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Name is not None:
+            namespaceprefix_ = self.Name_nsprefix_ + ':' if (UseCapturedNS_ and self.Name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sName>%s</%sName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Name), input_name='Name')), namespaceprefix_ , eol_))
+        if self.RemoteOWS is not None:
+            namespaceprefix_ = self.RemoteOWS_nsprefix_ + ':' if (UseCapturedNS_ and self.RemoteOWS_nsprefix_) else ''
+            self.RemoteOWS.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='RemoteOWS', pretty_print=pretty_print)
+        if self.LayerFeatureConstraints is not None:
+            namespaceprefix_ = self.LayerFeatureConstraints_nsprefix_ + ':' if (UseCapturedNS_ and self.LayerFeatureConstraints_nsprefix_) else ''
+            self.LayerFeatureConstraints.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='LayerFeatureConstraints', pretty_print=pretty_print)
+        for UserStyle_ in self.UserStyle:
+            namespaceprefix_ = self.UserStyle_nsprefix_ + ':' if (UseCapturedNS_ and self.UserStyle_nsprefix_) else ''
+            UserStyle_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='UserStyle', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Name')
+            value_ = self.gds_validate_string(value_, node, 'Name')
+            self.Name = value_
+            self.Name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'RemoteOWS':
+            obj_ = RemoteOWS.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RemoteOWS = obj_
+            obj_.original_tagname_ = 'RemoteOWS'
+        elif nodeName_ == 'LayerFeatureConstraints':
+            obj_ = LayerFeatureConstraints.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LayerFeatureConstraints = obj_
+            obj_.original_tagname_ = 'LayerFeatureConstraints'
+        elif nodeName_ == 'UserStyle':
+            obj_ = UserStyle.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserStyle.append(obj_)
+            obj_.original_tagname_ = 'UserStyle'
+# end class UserLayer
+
+
+class RemoteOWS(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Service=None, OnlineResource=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Service = Service
+        self.validate_Service(self.Service)
+        self.Service_nsprefix_ = "sld"
+        self.OnlineResource = OnlineResource
+        self.OnlineResource_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, RemoteOWS)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if RemoteOWS.subclass:
+            return RemoteOWS.subclass(*args_, **kwargs_)
+        else:
+            return RemoteOWS(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Service(self):
+        return self.Service
+    def set_Service(self, Service):
+        self.Service = Service
+    ServiceProp = property(get_Service, set_Service)
+    def get_OnlineResource(self):
+        return self.OnlineResource
+    def set_OnlineResource(self, OnlineResource):
+        self.OnlineResource = OnlineResource
+    OnlineResourceProp = property(get_OnlineResource, set_OnlineResource)
+    def validate_Service(self, value):
+        result = True
+        # Validate type Service, a restriction on xsd:string.
+        pass
+        return result
+    def _hasContent(self):
+        if (
+            self.Service is not None or
+            self.OnlineResource is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='RemoteOWS', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('RemoteOWS')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'RemoteOWS':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='RemoteOWS')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='RemoteOWS', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='RemoteOWS'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='RemoteOWS', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Service is not None:
+            namespaceprefix_ = self.Service_nsprefix_ + ':' if (UseCapturedNS_ and self.Service_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sService>%s</%sService>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Service), input_name='Service')), namespaceprefix_ , eol_))
+        if self.OnlineResource is not None:
+            namespaceprefix_ = self.OnlineResource_nsprefix_ + ':' if (UseCapturedNS_ and self.OnlineResource_nsprefix_) else ''
+            self.OnlineResource.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='OnlineResource', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Service':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Service')
+            value_ = self.gds_validate_string(value_, node, 'Service')
+            self.Service = value_
+            self.Service_nsprefix_ = child_.prefix
+            # validate type Service
+            self.validate_Service(self.Service)
+        elif nodeName_ == 'OnlineResource':
+            obj_ = OnlineResource.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.OnlineResource = obj_
+            obj_.original_tagname_ = 'OnlineResource'
+# end class RemoteOWS
+
+
+class Service(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Service)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Service.subclass:
+            return Service.subclass(*args_, **kwargs_)
+        else:
+            return Service(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def validate_Service(self, value):
+        result = True
+        # Validate type Service, a restriction on xsd:string.
+        pass
+        return result
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Service', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Service')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Service':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Service')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Service', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Service'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Service', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class Service
+
+
+class OnlineResource(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, OnlineResource)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if OnlineResource.subclass:
+            return OnlineResource.subclass(*args_, **kwargs_)
+        else:
+            return OnlineResource(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='OnlineResource', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('OnlineResource')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'OnlineResource':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='OnlineResource')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='OnlineResource', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='OnlineResource'):
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='OnlineResource', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class OnlineResource
+
+
+class LayerFeatureConstraints(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, FeatureTypeConstraint=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        if FeatureTypeConstraint is None:
+            self.FeatureTypeConstraint = []
+        else:
+            self.FeatureTypeConstraint = FeatureTypeConstraint
+        self.FeatureTypeConstraint_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LayerFeatureConstraints)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LayerFeatureConstraints.subclass:
+            return LayerFeatureConstraints.subclass(*args_, **kwargs_)
+        else:
+            return LayerFeatureConstraints(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_FeatureTypeConstraint(self):
+        return self.FeatureTypeConstraint
+    def set_FeatureTypeConstraint(self, FeatureTypeConstraint):
+        self.FeatureTypeConstraint = FeatureTypeConstraint
+    def add_FeatureTypeConstraint(self, value):
+        self.FeatureTypeConstraint.append(value)
+    def insert_FeatureTypeConstraint_at(self, index, value):
+        self.FeatureTypeConstraint.insert(index, value)
+    def replace_FeatureTypeConstraint_at(self, index, value):
+        self.FeatureTypeConstraint[index] = value
+    FeatureTypeConstraintProp = property(get_FeatureTypeConstraint, set_FeatureTypeConstraint)
+    def _hasContent(self):
+        if (
+            self.FeatureTypeConstraint
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LayerFeatureConstraints', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LayerFeatureConstraints')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LayerFeatureConstraints':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LayerFeatureConstraints')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LayerFeatureConstraints', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='LayerFeatureConstraints'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LayerFeatureConstraints', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for FeatureTypeConstraint_ in self.FeatureTypeConstraint:
+            namespaceprefix_ = self.FeatureTypeConstraint_nsprefix_ + ':' if (UseCapturedNS_ and self.FeatureTypeConstraint_nsprefix_) else ''
+            FeatureTypeConstraint_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='FeatureTypeConstraint', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'FeatureTypeConstraint':
+            obj_ = FeatureTypeConstraint.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.FeatureTypeConstraint.append(obj_)
+            obj_.original_tagname_ = 'FeatureTypeConstraint'
+# end class LayerFeatureConstraints
+
+
+class FeatureTypeConstraint(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, FeatureTypeName=None, Filter=None, Extent=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.FeatureTypeName = FeatureTypeName
+        self.FeatureTypeName_nsprefix_ = "sld"
+        self.Filter = Filter
+        self.Filter_nsprefix_ = "ogc"
+        if Extent is None:
+            self.Extent = []
+        else:
+            self.Extent = Extent
+        self.Extent_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, FeatureTypeConstraint)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if FeatureTypeConstraint.subclass:
+            return FeatureTypeConstraint.subclass(*args_, **kwargs_)
+        else:
+            return FeatureTypeConstraint(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_FeatureTypeName(self):
+        return self.FeatureTypeName
+    def set_FeatureTypeName(self, FeatureTypeName):
+        self.FeatureTypeName = FeatureTypeName
+    FeatureTypeNameProp = property(get_FeatureTypeName, set_FeatureTypeName)
+    def get_Filter(self):
+        return self.Filter
+    def set_Filter(self, Filter):
+        self.Filter = Filter
+    FilterProp = property(get_Filter, set_Filter)
+    def get_Extent(self):
+        return self.Extent
+    def set_Extent(self, Extent):
+        self.Extent = Extent
+    def add_Extent(self, value):
+        self.Extent.append(value)
+    def insert_Extent_at(self, index, value):
+        self.Extent.insert(index, value)
+    def replace_Extent_at(self, index, value):
+        self.Extent[index] = value
+    ExtentProp = property(get_Extent, set_Extent)
+    def _hasContent(self):
+        if (
+            self.FeatureTypeName is not None or
+            self.Filter is not None or
+            self.Extent
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='FeatureTypeConstraint', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('FeatureTypeConstraint')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'FeatureTypeConstraint':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='FeatureTypeConstraint')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='FeatureTypeConstraint', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='FeatureTypeConstraint'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='FeatureTypeConstraint', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.FeatureTypeName is not None:
+            namespaceprefix_ = self.FeatureTypeName_nsprefix_ + ':' if (UseCapturedNS_ and self.FeatureTypeName_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sFeatureTypeName>%s</%sFeatureTypeName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.FeatureTypeName), input_name='FeatureTypeName')), namespaceprefix_ , eol_))
+        if self.Filter is not None:
+            namespaceprefix_ = self.Filter_nsprefix_ + ':' if (UseCapturedNS_ and self.Filter_nsprefix_) else ''
+            self.Filter.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='Filter', pretty_print=pretty_print)
+        for Extent_ in self.Extent:
+            namespaceprefix_ = self.Extent_nsprefix_ + ':' if (UseCapturedNS_ and self.Extent_nsprefix_) else ''
+            Extent_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Extent', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'FeatureTypeName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'FeatureTypeName')
+            value_ = self.gds_validate_string(value_, node, 'FeatureTypeName')
+            self.FeatureTypeName = value_
+            self.FeatureTypeName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Filter':
+            obj_ = FilterType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Filter = obj_
+            obj_.original_tagname_ = 'Filter'
+        elif nodeName_ == 'Extent':
+            obj_ = Extent.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Extent.append(obj_)
+            obj_.original_tagname_ = 'Extent'
+# end class FeatureTypeConstraint
+
+
+class Extent(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Name=None, Value=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Name = Name
+        self.Name_nsprefix_ = "sld"
+        self.Value = Value
+        self.Value_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Extent)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Extent.subclass:
+            return Extent.subclass(*args_, **kwargs_)
+        else:
+            return Extent(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Name(self):
+        return self.Name
+    def set_Name(self, Name):
+        self.Name = Name
+    NameProp = property(get_Name, set_Name)
+    def get_Value(self):
+        return self.Value
+    def set_Value(self, Value):
+        self.Value = Value
+    ValueProp = property(get_Value, set_Value)
+    def _hasContent(self):
+        if (
+            self.Name is not None or
+            self.Value is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Extent', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Extent')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Extent':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Extent')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Extent', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Extent'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Extent', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Name is not None:
+            namespaceprefix_ = self.Name_nsprefix_ + ':' if (UseCapturedNS_ and self.Name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sName>%s</%sName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Name), input_name='Name')), namespaceprefix_ , eol_))
+        if self.Value is not None:
+            namespaceprefix_ = self.Value_nsprefix_ + ':' if (UseCapturedNS_ and self.Value_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sValue>%s</%sValue>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Value), input_name='Value')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Name')
+            value_ = self.gds_validate_string(value_, node, 'Name')
+            self.Name = value_
+            self.Name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Value':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Value')
+            value_ = self.gds_validate_string(value_, node, 'Value')
+            self.Value = value_
+            self.Value_nsprefix_ = child_.prefix
+# end class Extent
+
+
+class UserStyle(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Name=None, Title=None, Abstract=None, IsDefault=None, FeatureTypeStyle=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Name = Name
+        self.Name_nsprefix_ = "sld"
+        self.Title = Title
+        self.Title_nsprefix_ = "sld"
+        self.Abstract = Abstract
+        self.Abstract_nsprefix_ = "sld"
+        self.IsDefault = IsDefault
+        self.IsDefault_nsprefix_ = "sld"
+        if FeatureTypeStyle is None:
+            self.FeatureTypeStyle = []
+        else:
+            self.FeatureTypeStyle = FeatureTypeStyle
+        self.FeatureTypeStyle_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, UserStyle)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if UserStyle.subclass:
+            return UserStyle.subclass(*args_, **kwargs_)
+        else:
+            return UserStyle(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Name(self):
+        return self.Name
+    def set_Name(self, Name):
+        self.Name = Name
+    NameProp = property(get_Name, set_Name)
+    def get_Title(self):
+        return self.Title
+    def set_Title(self, Title):
+        self.Title = Title
+    TitleProp = property(get_Title, set_Title)
+    def get_Abstract(self):
+        return self.Abstract
+    def set_Abstract(self, Abstract):
+        self.Abstract = Abstract
+    AbstractProp = property(get_Abstract, set_Abstract)
+    def get_IsDefault(self):
+        return self.IsDefault
+    def set_IsDefault(self, IsDefault):
+        self.IsDefault = IsDefault
+    IsDefaultProp = property(get_IsDefault, set_IsDefault)
+    def get_FeatureTypeStyle(self):
+        return self.FeatureTypeStyle
+    def set_FeatureTypeStyle(self, FeatureTypeStyle):
+        self.FeatureTypeStyle = FeatureTypeStyle
+    def add_FeatureTypeStyle(self, value):
+        self.FeatureTypeStyle.append(value)
+    def insert_FeatureTypeStyle_at(self, index, value):
+        self.FeatureTypeStyle.insert(index, value)
+    def replace_FeatureTypeStyle_at(self, index, value):
+        self.FeatureTypeStyle[index] = value
+    FeatureTypeStyleProp = property(get_FeatureTypeStyle, set_FeatureTypeStyle)
+    def _hasContent(self):
+        if (
+            self.Name is not None or
+            self.Title is not None or
+            self.Abstract is not None or
+            self.IsDefault is not None or
+            self.FeatureTypeStyle
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='UserStyle', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('UserStyle')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'UserStyle':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='UserStyle')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='UserStyle', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='UserStyle'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='UserStyle', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Name is not None:
+            namespaceprefix_ = self.Name_nsprefix_ + ':' if (UseCapturedNS_ and self.Name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sName>%s</%sName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Name), input_name='Name')), namespaceprefix_ , eol_))
+        if self.Title is not None:
+            namespaceprefix_ = self.Title_nsprefix_ + ':' if (UseCapturedNS_ and self.Title_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTitle>%s</%sTitle>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Title), input_name='Title')), namespaceprefix_ , eol_))
+        if self.Abstract is not None:
+            namespaceprefix_ = self.Abstract_nsprefix_ + ':' if (UseCapturedNS_ and self.Abstract_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sAbstract>%s</%sAbstract>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Abstract), input_name='Abstract')), namespaceprefix_ , eol_))
+        if self.IsDefault is not None:
+            namespaceprefix_ = self.IsDefault_nsprefix_ + ':' if (UseCapturedNS_ and self.IsDefault_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sIsDefault>%s</%sIsDefault>%s' % (namespaceprefix_ , self.gds_format_boolean(self.IsDefault, input_name='IsDefault'), namespaceprefix_ , eol_))
+        for FeatureTypeStyle_ in self.FeatureTypeStyle:
+            namespaceprefix_ = self.FeatureTypeStyle_nsprefix_ + ':' if (UseCapturedNS_ and self.FeatureTypeStyle_nsprefix_) else ''
+            FeatureTypeStyle_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='FeatureTypeStyle', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Name')
+            value_ = self.gds_validate_string(value_, node, 'Name')
+            self.Name = value_
+            self.Name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Title':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Title')
+            value_ = self.gds_validate_string(value_, node, 'Title')
+            self.Title = value_
+            self.Title_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Abstract':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Abstract')
+            value_ = self.gds_validate_string(value_, node, 'Abstract')
+            self.Abstract = value_
+            self.Abstract_nsprefix_ = child_.prefix
+        elif nodeName_ == 'IsDefault':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'IsDefault')
+            ival_ = self.gds_validate_boolean(ival_, node, 'IsDefault')
+            self.IsDefault = ival_
+            self.IsDefault_nsprefix_ = child_.prefix
+        elif nodeName_ == 'FeatureTypeStyle':
+            obj_ = FeatureTypeStyle.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.FeatureTypeStyle.append(obj_)
+            obj_.original_tagname_ = 'FeatureTypeStyle'
+# end class UserStyle
+
+
+class FeatureTypeStyle(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Name=None, Title=None, Abstract=None, FeatureTypeName=None, SemanticTypeIdentifier=None, Rule=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Name = Name
+        self.Name_nsprefix_ = "sld"
+        self.Title = Title
+        self.Title_nsprefix_ = "sld"
+        self.Abstract = Abstract
+        self.Abstract_nsprefix_ = "sld"
+        self.FeatureTypeName = FeatureTypeName
+        self.FeatureTypeName_nsprefix_ = "sld"
+        if SemanticTypeIdentifier is None:
+            self.SemanticTypeIdentifier = []
+        else:
+            self.SemanticTypeIdentifier = SemanticTypeIdentifier
+        self.SemanticTypeIdentifier_nsprefix_ = "sld"
+        if Rule is None:
+            self.Rule = []
+        else:
+            self.Rule = Rule
+        self.Rule_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, FeatureTypeStyle)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if FeatureTypeStyle.subclass:
+            return FeatureTypeStyle.subclass(*args_, **kwargs_)
+        else:
+            return FeatureTypeStyle(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Name(self):
+        return self.Name
+    def set_Name(self, Name):
+        self.Name = Name
+    NameProp = property(get_Name, set_Name)
+    def get_Title(self):
+        return self.Title
+    def set_Title(self, Title):
+        self.Title = Title
+    TitleProp = property(get_Title, set_Title)
+    def get_Abstract(self):
+        return self.Abstract
+    def set_Abstract(self, Abstract):
+        self.Abstract = Abstract
+    AbstractProp = property(get_Abstract, set_Abstract)
+    def get_FeatureTypeName(self):
+        return self.FeatureTypeName
+    def set_FeatureTypeName(self, FeatureTypeName):
+        self.FeatureTypeName = FeatureTypeName
+    FeatureTypeNameProp = property(get_FeatureTypeName, set_FeatureTypeName)
+    def get_SemanticTypeIdentifier(self):
+        return self.SemanticTypeIdentifier
+    def set_SemanticTypeIdentifier(self, SemanticTypeIdentifier):
+        self.SemanticTypeIdentifier = SemanticTypeIdentifier
+    def add_SemanticTypeIdentifier(self, value):
+        self.SemanticTypeIdentifier.append(value)
+    def insert_SemanticTypeIdentifier_at(self, index, value):
+        self.SemanticTypeIdentifier.insert(index, value)
+    def replace_SemanticTypeIdentifier_at(self, index, value):
+        self.SemanticTypeIdentifier[index] = value
+    SemanticTypeIdentifierProp = property(get_SemanticTypeIdentifier, set_SemanticTypeIdentifier)
+    def get_Rule(self):
+        return self.Rule
+    def set_Rule(self, Rule):
+        self.Rule = Rule
+    def add_Rule(self, value):
+        self.Rule.append(value)
+    def insert_Rule_at(self, index, value):
+        self.Rule.insert(index, value)
+    def replace_Rule_at(self, index, value):
+        self.Rule[index] = value
+    RuleProp = property(get_Rule, set_Rule)
+    def _hasContent(self):
+        if (
+            self.Name is not None or
+            self.Title is not None or
+            self.Abstract is not None or
+            self.FeatureTypeName is not None or
+            self.SemanticTypeIdentifier or
+            self.Rule
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='FeatureTypeStyle', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('FeatureTypeStyle')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'FeatureTypeStyle':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='FeatureTypeStyle')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='FeatureTypeStyle', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='FeatureTypeStyle'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='FeatureTypeStyle', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Name is not None:
+            namespaceprefix_ = self.Name_nsprefix_ + ':' if (UseCapturedNS_ and self.Name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sName>%s</%sName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Name), input_name='Name')), namespaceprefix_ , eol_))
+        if self.Title is not None:
+            namespaceprefix_ = self.Title_nsprefix_ + ':' if (UseCapturedNS_ and self.Title_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTitle>%s</%sTitle>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Title), input_name='Title')), namespaceprefix_ , eol_))
+        if self.Abstract is not None:
+            namespaceprefix_ = self.Abstract_nsprefix_ + ':' if (UseCapturedNS_ and self.Abstract_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sAbstract>%s</%sAbstract>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Abstract), input_name='Abstract')), namespaceprefix_ , eol_))
+        if self.FeatureTypeName is not None:
+            namespaceprefix_ = self.FeatureTypeName_nsprefix_ + ':' if (UseCapturedNS_ and self.FeatureTypeName_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sFeatureTypeName>%s</%sFeatureTypeName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.FeatureTypeName), input_name='FeatureTypeName')), namespaceprefix_ , eol_))
+        for SemanticTypeIdentifier_ in self.SemanticTypeIdentifier:
+            namespaceprefix_ = self.SemanticTypeIdentifier_nsprefix_ + ':' if (UseCapturedNS_ and self.SemanticTypeIdentifier_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sSemanticTypeIdentifier>%s</%sSemanticTypeIdentifier>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(SemanticTypeIdentifier_), input_name='SemanticTypeIdentifier')), namespaceprefix_ , eol_))
+        for Rule_ in self.Rule:
+            namespaceprefix_ = self.Rule_nsprefix_ + ':' if (UseCapturedNS_ and self.Rule_nsprefix_) else ''
+            Rule_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Rule', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Name')
+            value_ = self.gds_validate_string(value_, node, 'Name')
+            self.Name = value_
+            self.Name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Title':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Title')
+            value_ = self.gds_validate_string(value_, node, 'Title')
+            self.Title = value_
+            self.Title_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Abstract':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Abstract')
+            value_ = self.gds_validate_string(value_, node, 'Abstract')
+            self.Abstract = value_
+            self.Abstract_nsprefix_ = child_.prefix
+        elif nodeName_ == 'FeatureTypeName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'FeatureTypeName')
+            value_ = self.gds_validate_string(value_, node, 'FeatureTypeName')
+            self.FeatureTypeName = value_
+            self.FeatureTypeName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'SemanticTypeIdentifier':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'SemanticTypeIdentifier')
+            value_ = self.gds_validate_string(value_, node, 'SemanticTypeIdentifier')
+            self.SemanticTypeIdentifier.append(value_)
+            self.SemanticTypeIdentifier_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Rule':
+            obj_ = Rule.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Rule.append(obj_)
+            obj_.original_tagname_ = 'Rule'
+# end class FeatureTypeStyle
+
+
+class Rule(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Name=None, Title=None, Abstract=None, LegendGraphic=None, Filter=None, ElseFilter=None, MinScaleDenominator=None, MaxScaleDenominator=None, Symbolizer=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Name = Name
+        self.Name_nsprefix_ = "sld"
+        self.Title = Title
+        self.Title_nsprefix_ = "sld"
+        self.Abstract = Abstract
+        self.Abstract_nsprefix_ = "sld"
+        self.LegendGraphic = LegendGraphic
+        self.LegendGraphic_nsprefix_ = "sld"
+        self.Filter = Filter
+        self.Filter_nsprefix_ = "ogc"
+        self.ElseFilter = ElseFilter
+        self.ElseFilter_nsprefix_ = "sld"
+        self.MinScaleDenominator = MinScaleDenominator
+        self.MinScaleDenominator_nsprefix_ = "sld"
+        self.MaxScaleDenominator = MaxScaleDenominator
+        self.MaxScaleDenominator_nsprefix_ = "sld"
+        if Symbolizer is None:
+            self.Symbolizer = []
+        else:
+            self.Symbolizer = Symbolizer
+        self.Symbolizer_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Rule)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Rule.subclass:
+            return Rule.subclass(*args_, **kwargs_)
+        else:
+            return Rule(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Name(self):
+        return self.Name
+    def set_Name(self, Name):
+        self.Name = Name
+    NameProp = property(get_Name, set_Name)
+    def get_Title(self):
+        return self.Title
+    def set_Title(self, Title):
+        self.Title = Title
+    TitleProp = property(get_Title, set_Title)
+    def get_Abstract(self):
+        return self.Abstract
+    def set_Abstract(self, Abstract):
+        self.Abstract = Abstract
+    AbstractProp = property(get_Abstract, set_Abstract)
+    def get_LegendGraphic(self):
+        return self.LegendGraphic
+    def set_LegendGraphic(self, LegendGraphic):
+        self.LegendGraphic = LegendGraphic
+    LegendGraphicProp = property(get_LegendGraphic, set_LegendGraphic)
+    def get_Filter(self):
+        return self.Filter
+    def set_Filter(self, Filter):
+        self.Filter = Filter
+    FilterProp = property(get_Filter, set_Filter)
+    def get_ElseFilter(self):
+        return self.ElseFilter
+    def set_ElseFilter(self, ElseFilter):
+        self.ElseFilter = ElseFilter
+    ElseFilterProp = property(get_ElseFilter, set_ElseFilter)
+    def get_MinScaleDenominator(self):
+        return self.MinScaleDenominator
+    def set_MinScaleDenominator(self, MinScaleDenominator):
+        self.MinScaleDenominator = MinScaleDenominator
+    MinScaleDenominatorProp = property(get_MinScaleDenominator, set_MinScaleDenominator)
+    def get_MaxScaleDenominator(self):
+        return self.MaxScaleDenominator
+    def set_MaxScaleDenominator(self, MaxScaleDenominator):
+        self.MaxScaleDenominator = MaxScaleDenominator
+    MaxScaleDenominatorProp = property(get_MaxScaleDenominator, set_MaxScaleDenominator)
+    def get_Symbolizer(self):
+        return self.Symbolizer
+    def set_Symbolizer(self, Symbolizer):
+        self.Symbolizer = Symbolizer
+    def add_Symbolizer(self, value):
+        self.Symbolizer.append(value)
+    def insert_Symbolizer_at(self, index, value):
+        self.Symbolizer.insert(index, value)
+    def replace_Symbolizer_at(self, index, value):
+        self.Symbolizer[index] = value
+    SymbolizerProp = property(get_Symbolizer, set_Symbolizer)
+    def _hasContent(self):
+        if (
+            self.Name is not None or
+            self.Title is not None or
+            self.Abstract is not None or
+            self.LegendGraphic is not None or
+            self.Filter is not None or
+            self.ElseFilter is not None or
+            self.MinScaleDenominator is not None or
+            self.MaxScaleDenominator is not None or
+            self.Symbolizer
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='Rule', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Rule')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Rule':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Rule')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Rule', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Rule'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='Rule', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Name is not None:
+            namespaceprefix_ = self.Name_nsprefix_ + ':' if (UseCapturedNS_ and self.Name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sName>%s</%sName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Name), input_name='Name')), namespaceprefix_ , eol_))
+        if self.Title is not None:
+            namespaceprefix_ = self.Title_nsprefix_ + ':' if (UseCapturedNS_ and self.Title_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTitle>%s</%sTitle>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Title), input_name='Title')), namespaceprefix_ , eol_))
+        if self.Abstract is not None:
+            namespaceprefix_ = self.Abstract_nsprefix_ + ':' if (UseCapturedNS_ and self.Abstract_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sAbstract>%s</%sAbstract>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Abstract), input_name='Abstract')), namespaceprefix_ , eol_))
+        if self.LegendGraphic is not None:
+            namespaceprefix_ = self.LegendGraphic_nsprefix_ + ':' if (UseCapturedNS_ and self.LegendGraphic_nsprefix_) else ''
+            self.LegendGraphic.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='LegendGraphic', pretty_print=pretty_print)
+        if self.Filter is not None:
+            namespaceprefix_ = self.Filter_nsprefix_ + ':' if (UseCapturedNS_ and self.Filter_nsprefix_) else ''
+            self.Filter.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='Filter', pretty_print=pretty_print)
+        if self.ElseFilter is not None:
+            namespaceprefix_ = self.ElseFilter_nsprefix_ + ':' if (UseCapturedNS_ and self.ElseFilter_nsprefix_) else ''
+            self.ElseFilter.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ElseFilter', pretty_print=pretty_print)
+        if self.MinScaleDenominator is not None:
+            namespaceprefix_ = self.MinScaleDenominator_nsprefix_ + ':' if (UseCapturedNS_ and self.MinScaleDenominator_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMinScaleDenominator>%s</%sMinScaleDenominator>%s' % (namespaceprefix_ , self.gds_format_double(self.MinScaleDenominator, input_name='MinScaleDenominator'), namespaceprefix_ , eol_))
+        if self.MaxScaleDenominator is not None:
+            namespaceprefix_ = self.MaxScaleDenominator_nsprefix_ + ':' if (UseCapturedNS_ and self.MaxScaleDenominator_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMaxScaleDenominator>%s</%sMaxScaleDenominator>%s' % (namespaceprefix_ , self.gds_format_double(self.MaxScaleDenominator, input_name='MaxScaleDenominator'), namespaceprefix_ , eol_))
+        for Symbolizer_ in self.Symbolizer:
+            Symbolizer_.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Name')
+            value_ = self.gds_validate_string(value_, node, 'Name')
+            self.Name = value_
+            self.Name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Title':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Title')
+            value_ = self.gds_validate_string(value_, node, 'Title')
+            self.Title = value_
+            self.Title_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Abstract':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Abstract')
+            value_ = self.gds_validate_string(value_, node, 'Abstract')
+            self.Abstract = value_
+            self.Abstract_nsprefix_ = child_.prefix
+        elif nodeName_ == 'LegendGraphic':
+            obj_ = LegendGraphic.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LegendGraphic = obj_
+            obj_.original_tagname_ = 'LegendGraphic'
+        elif nodeName_ == 'Filter':
+            obj_ = FilterType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Filter = obj_
+            obj_.original_tagname_ = 'Filter'
+        elif nodeName_ == 'ElseFilter':
+            obj_ = ElseFilter.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ElseFilter = obj_
+            obj_.original_tagname_ = 'ElseFilter'
+        elif nodeName_ == 'MinScaleDenominator' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'MinScaleDenominator')
+            fval_ = self.gds_validate_double(fval_, node, 'MinScaleDenominator')
+            self.MinScaleDenominator = fval_
+            self.MinScaleDenominator_nsprefix_ = child_.prefix
+        elif nodeName_ == 'MaxScaleDenominator' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'MaxScaleDenominator')
+            fval_ = self.gds_validate_double(fval_, node, 'MaxScaleDenominator')
+            self.MaxScaleDenominator = fval_
+            self.MaxScaleDenominator_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Symbolizer':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <Symbolizer> element')
+            self.Symbolizer.append(obj_)
+            obj_.original_tagname_ = 'Symbolizer'
+        elif nodeName_ == 'LineSymbolizer':
+            obj_ = LineSymbolizer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Symbolizer.append(obj_)
+            obj_.original_tagname_ = 'LineSymbolizer'
+        elif nodeName_ == 'PolygonSymbolizer':
+            obj_ = PolygonSymbolizer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Symbolizer.append(obj_)
+            obj_.original_tagname_ = 'PolygonSymbolizer'
+        elif nodeName_ == 'PointSymbolizer':
+            obj_ = PointSymbolizer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Symbolizer.append(obj_)
+            obj_.original_tagname_ = 'PointSymbolizer'
+        elif nodeName_ == 'TextSymbolizer':
+            obj_ = TextSymbolizer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Symbolizer.append(obj_)
+            obj_.original_tagname_ = 'TextSymbolizer'
+        elif nodeName_ == 'RasterSymbolizer':
+            obj_ = RasterSymbolizer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Symbolizer.append(obj_)
+            obj_.original_tagname_ = 'RasterSymbolizer'
+# end class Rule
+
+
+class LegendGraphic(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Graphic=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Graphic = Graphic
+        self.Graphic_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LegendGraphic)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LegendGraphic.subclass:
+            return LegendGraphic.subclass(*args_, **kwargs_)
+        else:
+            return LegendGraphic(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Graphic(self):
+        return self.Graphic
+    def set_Graphic(self, Graphic):
+        self.Graphic = Graphic
+    GraphicProp = property(get_Graphic, set_Graphic)
+    def _hasContent(self):
+        if (
+            self.Graphic is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LegendGraphic', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LegendGraphic')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LegendGraphic':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LegendGraphic')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LegendGraphic', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='LegendGraphic'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LegendGraphic', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Graphic is not None:
+            namespaceprefix_ = self.Graphic_nsprefix_ + ':' if (UseCapturedNS_ and self.Graphic_nsprefix_) else ''
+            self.Graphic.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Graphic', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Graphic':
+            obj_ = Graphic.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Graphic = obj_
+            obj_.original_tagname_ = 'Graphic'
+# end class LegendGraphic
+
+
+class ElseFilter(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ElseFilter)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ElseFilter.subclass:
+            return ElseFilter.subclass(*args_, **kwargs_)
+        else:
+            return ElseFilter(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ElseFilter', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ElseFilter')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ElseFilter':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ElseFilter')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ElseFilter', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ElseFilter'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ElseFilter', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class ElseFilter
+
+
+class SymbolizerType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.extensiontype_ = extensiontype_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SymbolizerType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if SymbolizerType.subclass:
+            return SymbolizerType.subclass(*args_, **kwargs_)
+        else:
+            return SymbolizerType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='SymbolizerType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('SymbolizerType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'SymbolizerType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='SymbolizerType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='SymbolizerType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='SymbolizerType'):
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='SymbolizerType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class SymbolizerType
+
+
+class LineSymbolizer(SymbolizerType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = SymbolizerType
+    def __init__(self, Geometry=None, Stroke=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("LineSymbolizer"), self).__init__( **kwargs_)
+        self.Geometry = Geometry
+        self.Geometry_nsprefix_ = "sld"
+        self.Stroke = Stroke
+        self.Stroke_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LineSymbolizer)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LineSymbolizer.subclass:
+            return LineSymbolizer.subclass(*args_, **kwargs_)
+        else:
+            return LineSymbolizer(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Geometry(self):
+        return self.Geometry
+    def set_Geometry(self, Geometry):
+        self.Geometry = Geometry
+    GeometryProp = property(get_Geometry, set_Geometry)
+    def get_Stroke(self):
+        return self.Stroke
+    def set_Stroke(self, Stroke):
+        self.Stroke = Stroke
+    StrokeProp = property(get_Stroke, set_Stroke)
+    def _hasContent(self):
+        if (
+            self.Geometry is not None or
+            self.Stroke is not None or
+            super(LineSymbolizer, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LineSymbolizer', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LineSymbolizer')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LineSymbolizer':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LineSymbolizer')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LineSymbolizer', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='LineSymbolizer'):
+        super(LineSymbolizer, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LineSymbolizer')
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LineSymbolizer', fromsubclass_=False, pretty_print=True):
+        super(LineSymbolizer, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Geometry is not None:
+            namespaceprefix_ = self.Geometry_nsprefix_ + ':' if (UseCapturedNS_ and self.Geometry_nsprefix_) else ''
+            self.Geometry.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Geometry', pretty_print=pretty_print)
+        if self.Stroke is not None:
+            namespaceprefix_ = self.Stroke_nsprefix_ + ':' if (UseCapturedNS_ and self.Stroke_nsprefix_) else ''
+            self.Stroke.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Stroke', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(LineSymbolizer, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Geometry':
+            obj_ = Geometry.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Geometry = obj_
+            obj_.original_tagname_ = 'Geometry'
+        elif nodeName_ == 'Stroke':
+            obj_ = Stroke.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Stroke = obj_
+            obj_.original_tagname_ = 'Stroke'
+        super(LineSymbolizer, self)._buildChildren(child_, node, nodeName_, True)
+# end class LineSymbolizer
+
+
+class Geometry(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, PropertyName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.PropertyName = PropertyName
+        self.PropertyName_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Geometry)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Geometry.subclass:
+            return Geometry.subclass(*args_, **kwargs_)
+        else:
+            return Geometry(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PropertyName(self):
+        return self.PropertyName
+    def set_PropertyName(self, PropertyName):
+        self.PropertyName = PropertyName
+    PropertyNameProp = property(get_PropertyName, set_PropertyName)
+    def _hasContent(self):
+        if (
+            self.PropertyName is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='Geometry', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Geometry')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Geometry':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Geometry')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Geometry', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Geometry'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='Geometry', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.PropertyName is not None:
+            namespaceprefix_ = self.PropertyName_nsprefix_ + ':' if (UseCapturedNS_ and self.PropertyName_nsprefix_) else ''
+            self.PropertyName.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='PropertyName', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PropertyName = obj_
+            obj_.original_tagname_ = 'PropertyName'
+# end class Geometry
+
+
+class Stroke(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, GraphicFill=None, GraphicStroke=None, CssParameter=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.GraphicFill = GraphicFill
+        self.GraphicFill_nsprefix_ = "sld"
+        self.GraphicStroke = GraphicStroke
+        self.GraphicStroke_nsprefix_ = "sld"
+        if CssParameter is None:
+            self.CssParameter = []
+        else:
+            self.CssParameter = CssParameter
+        self.CssParameter_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Stroke)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Stroke.subclass:
+            return Stroke.subclass(*args_, **kwargs_)
+        else:
+            return Stroke(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_GraphicFill(self):
+        return self.GraphicFill
+    def set_GraphicFill(self, GraphicFill):
+        self.GraphicFill = GraphicFill
+    GraphicFillProp = property(get_GraphicFill, set_GraphicFill)
+    def get_GraphicStroke(self):
+        return self.GraphicStroke
+    def set_GraphicStroke(self, GraphicStroke):
+        self.GraphicStroke = GraphicStroke
+    GraphicStrokeProp = property(get_GraphicStroke, set_GraphicStroke)
+    def get_CssParameter(self):
+        return self.CssParameter
+    def set_CssParameter(self, CssParameter):
+        self.CssParameter = CssParameter
+    def add_CssParameter(self, value):
+        self.CssParameter.append(value)
+    def insert_CssParameter_at(self, index, value):
+        self.CssParameter.insert(index, value)
+    def replace_CssParameter_at(self, index, value):
+        self.CssParameter[index] = value
+    CssParameterProp = property(get_CssParameter, set_CssParameter)
+    def _hasContent(self):
+        if (
+            self.GraphicFill is not None or
+            self.GraphicStroke is not None or
+            self.CssParameter
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Stroke', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Stroke')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Stroke':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Stroke')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Stroke', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Stroke'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Stroke', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.GraphicFill is not None:
+            namespaceprefix_ = self.GraphicFill_nsprefix_ + ':' if (UseCapturedNS_ and self.GraphicFill_nsprefix_) else ''
+            self.GraphicFill.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='GraphicFill', pretty_print=pretty_print)
+        if self.GraphicStroke is not None:
+            namespaceprefix_ = self.GraphicStroke_nsprefix_ + ':' if (UseCapturedNS_ and self.GraphicStroke_nsprefix_) else ''
+            self.GraphicStroke.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='GraphicStroke', pretty_print=pretty_print)
+        for CssParameter_ in self.CssParameter:
+            namespaceprefix_ = self.CssParameter_nsprefix_ + ':' if (UseCapturedNS_ and self.CssParameter_nsprefix_) else ''
+            CssParameter_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='CssParameter', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'GraphicFill':
+            obj_ = GraphicFill.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.GraphicFill = obj_
+            obj_.original_tagname_ = 'GraphicFill'
+        elif nodeName_ == 'GraphicStroke':
+            obj_ = GraphicStroke.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.GraphicStroke = obj_
+            obj_.original_tagname_ = 'GraphicStroke'
+        elif nodeName_ == 'CssParameter':
+            obj_ = CssParameter.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.CssParameter.append(obj_)
+            obj_.original_tagname_ = 'CssParameter'
+# end class Stroke
+
+
+class ParameterValueType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, expression=None, valueOf_=None, mixedclass_=None, content_=None, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        if expression is None:
+            self.expression = []
+        else:
+            self.expression = expression
+        self.expression_nsprefix_ = "ogc"
+        self.valueOf_ = valueOf_
+        self.extensiontype_ = extensiontype_
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+        self.valueOf_ = valueOf_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ParameterValueType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ParameterValueType.subclass:
+            return ParameterValueType.subclass(*args_, **kwargs_)
+        else:
+            return ParameterValueType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_expression(self):
+        return self.expression
+    def set_expression(self, expression):
+        self.expression = expression
+    def add_expression(self, value):
+        self.expression.append(value)
+    def insert_expression_at(self, index, value):
+        self.expression.insert(index, value)
+    def replace_expression_at(self, index, value):
+        self.expression[index] = value
+    expressionProp = property(get_expression, set_expression)
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+            self.expression or
+            (1 if type(self.valueOf_) in [int,float] else self.valueOf_) or
+            self.content_
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='ParameterValueType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ParameterValueType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ParameterValueType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ParameterValueType')
+        outfile.write('>')
+        self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_, pretty_print=pretty_print)
+        outfile.write(self.convert_unicode(self.valueOf_))
+        outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ParameterValueType'):
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='ParameterValueType', fromsubclass_=False, pretty_print=True):
+        if not fromsubclass_:
+            for item_ in self.content_:
+                item_.export(outfile, level, item_.name, namespaceprefix_, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for expression_ in self.expression:
+            expression_.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
+        if node.text is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', node.text)
+            self.content_.append(obj_)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'expression':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <expression> element')
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'expression', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_expression'):
+              self.add_expression(obj_.value)
+            elif hasattr(self, 'set_expression'):
+              self.set_expression(obj_.value)
+        elif nodeName_ == 'Add':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'Add', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_Add'):
+              self.add_Add(obj_.value)
+            elif hasattr(self, 'set_Add'):
+              self.set_Add(obj_.value)
+        elif nodeName_ == 'Sub':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'Sub', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_Sub'):
+              self.add_Sub(obj_.value)
+            elif hasattr(self, 'set_Sub'):
+              self.set_Sub(obj_.value)
+        elif nodeName_ == 'Mul':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'Mul', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_Mul'):
+              self.add_Mul(obj_.value)
+            elif hasattr(self, 'set_Mul'):
+              self.set_Mul(obj_.value)
+        elif nodeName_ == 'Div':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'Div', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_Div'):
+              self.add_Div(obj_.value)
+            elif hasattr(self, 'set_Div'):
+              self.set_Div(obj_.value)
+        elif nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'PropertyName', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_PropertyName'):
+              self.add_PropertyName(obj_.value)
+            elif hasattr(self, 'set_PropertyName'):
+              self.set_PropertyName(obj_.value)
+        elif nodeName_ == 'Function':
+            obj_ = FunctionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'Function', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_Function'):
+              self.add_Function(obj_.value)
+            elif hasattr(self, 'set_Function'):
+              self.set_Function(obj_.value)
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'Literal', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_Literal'):
+              self.add_Literal(obj_.value)
+            elif hasattr(self, 'set_Literal'):
+              self.set_Literal(obj_.value)
+        if not fromsubclass_ and child_.tail is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.tail)
+            self.content_.append(obj_)
+# end class ParameterValueType
+
+
+class GraphicFill(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Graphic=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Graphic = Graphic
+        self.Graphic_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, GraphicFill)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if GraphicFill.subclass:
+            return GraphicFill.subclass(*args_, **kwargs_)
+        else:
+            return GraphicFill(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Graphic(self):
+        return self.Graphic
+    def set_Graphic(self, Graphic):
+        self.Graphic = Graphic
+    GraphicProp = property(get_Graphic, set_Graphic)
+    def _hasContent(self):
+        if (
+            self.Graphic is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='GraphicFill', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('GraphicFill')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'GraphicFill':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='GraphicFill')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='GraphicFill', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='GraphicFill'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='GraphicFill', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Graphic is not None:
+            namespaceprefix_ = self.Graphic_nsprefix_ + ':' if (UseCapturedNS_ and self.Graphic_nsprefix_) else ''
+            self.Graphic.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Graphic', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Graphic':
+            obj_ = Graphic.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Graphic = obj_
+            obj_.original_tagname_ = 'Graphic'
+# end class GraphicFill
+
+
+class GraphicStroke(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Graphic=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Graphic = Graphic
+        self.Graphic_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, GraphicStroke)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if GraphicStroke.subclass:
+            return GraphicStroke.subclass(*args_, **kwargs_)
+        else:
+            return GraphicStroke(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Graphic(self):
+        return self.Graphic
+    def set_Graphic(self, Graphic):
+        self.Graphic = Graphic
+    GraphicProp = property(get_Graphic, set_Graphic)
+    def _hasContent(self):
+        if (
+            self.Graphic is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='GraphicStroke', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('GraphicStroke')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'GraphicStroke':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='GraphicStroke')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='GraphicStroke', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='GraphicStroke'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='GraphicStroke', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Graphic is not None:
+            namespaceprefix_ = self.Graphic_nsprefix_ + ':' if (UseCapturedNS_ and self.Graphic_nsprefix_) else ''
+            self.Graphic.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Graphic', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Graphic':
+            obj_ = Graphic.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Graphic = obj_
+            obj_.original_tagname_ = 'Graphic'
+# end class GraphicStroke
+
+
+class PolygonSymbolizer(SymbolizerType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = SymbolizerType
+    def __init__(self, Geometry=None, Fill=None, Stroke=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("PolygonSymbolizer"), self).__init__( **kwargs_)
+        self.Geometry = Geometry
+        self.Geometry_nsprefix_ = "sld"
+        self.Fill = Fill
+        self.Fill_nsprefix_ = "sld"
+        self.Stroke = Stroke
+        self.Stroke_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PolygonSymbolizer)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PolygonSymbolizer.subclass:
+            return PolygonSymbolizer.subclass(*args_, **kwargs_)
+        else:
+            return PolygonSymbolizer(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Geometry(self):
+        return self.Geometry
+    def set_Geometry(self, Geometry):
+        self.Geometry = Geometry
+    GeometryProp = property(get_Geometry, set_Geometry)
+    def get_Fill(self):
+        return self.Fill
+    def set_Fill(self, Fill):
+        self.Fill = Fill
+    FillProp = property(get_Fill, set_Fill)
+    def get_Stroke(self):
+        return self.Stroke
+    def set_Stroke(self, Stroke):
+        self.Stroke = Stroke
+    StrokeProp = property(get_Stroke, set_Stroke)
+    def _hasContent(self):
+        if (
+            self.Geometry is not None or
+            self.Fill is not None or
+            self.Stroke is not None or
+            super(PolygonSymbolizer, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='PolygonSymbolizer', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PolygonSymbolizer')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PolygonSymbolizer':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PolygonSymbolizer')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PolygonSymbolizer', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PolygonSymbolizer'):
+        super(PolygonSymbolizer, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PolygonSymbolizer')
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='PolygonSymbolizer', fromsubclass_=False, pretty_print=True):
+        super(PolygonSymbolizer, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Geometry is not None:
+            namespaceprefix_ = self.Geometry_nsprefix_ + ':' if (UseCapturedNS_ and self.Geometry_nsprefix_) else ''
+            self.Geometry.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Geometry', pretty_print=pretty_print)
+        if self.Fill is not None:
+            namespaceprefix_ = self.Fill_nsprefix_ + ':' if (UseCapturedNS_ and self.Fill_nsprefix_) else ''
+            self.Fill.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Fill', pretty_print=pretty_print)
+        if self.Stroke is not None:
+            namespaceprefix_ = self.Stroke_nsprefix_ + ':' if (UseCapturedNS_ and self.Stroke_nsprefix_) else ''
+            self.Stroke.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Stroke', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(PolygonSymbolizer, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Geometry':
+            obj_ = Geometry.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Geometry = obj_
+            obj_.original_tagname_ = 'Geometry'
+        elif nodeName_ == 'Fill':
+            obj_ = Fill.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Fill = obj_
+            obj_.original_tagname_ = 'Fill'
+        elif nodeName_ == 'Stroke':
+            obj_ = Stroke.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Stroke = obj_
+            obj_.original_tagname_ = 'Stroke'
+        super(PolygonSymbolizer, self)._buildChildren(child_, node, nodeName_, True)
+# end class PolygonSymbolizer
+
+
+class Fill(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, GraphicFill=None, CssParameter=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.GraphicFill = GraphicFill
+        self.GraphicFill_nsprefix_ = "sld"
+        if CssParameter is None:
+            self.CssParameter = []
+        else:
+            self.CssParameter = CssParameter
+        self.CssParameter_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Fill)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Fill.subclass:
+            return Fill.subclass(*args_, **kwargs_)
+        else:
+            return Fill(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_GraphicFill(self):
+        return self.GraphicFill
+    def set_GraphicFill(self, GraphicFill):
+        self.GraphicFill = GraphicFill
+    GraphicFillProp = property(get_GraphicFill, set_GraphicFill)
+    def get_CssParameter(self):
+        return self.CssParameter
+    def set_CssParameter(self, CssParameter):
+        self.CssParameter = CssParameter
+    def add_CssParameter(self, value):
+        self.CssParameter.append(value)
+    def insert_CssParameter_at(self, index, value):
+        self.CssParameter.insert(index, value)
+    def replace_CssParameter_at(self, index, value):
+        self.CssParameter[index] = value
+    CssParameterProp = property(get_CssParameter, set_CssParameter)
+    def _hasContent(self):
+        if (
+            self.GraphicFill is not None or
+            self.CssParameter
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Fill', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Fill')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Fill':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Fill')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Fill', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Fill'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Fill', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.GraphicFill is not None:
+            namespaceprefix_ = self.GraphicFill_nsprefix_ + ':' if (UseCapturedNS_ and self.GraphicFill_nsprefix_) else ''
+            self.GraphicFill.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='GraphicFill', pretty_print=pretty_print)
+        for CssParameter_ in self.CssParameter:
+            namespaceprefix_ = self.CssParameter_nsprefix_ + ':' if (UseCapturedNS_ and self.CssParameter_nsprefix_) else ''
+            CssParameter_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='CssParameter', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'GraphicFill':
+            obj_ = GraphicFill.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.GraphicFill = obj_
+            obj_.original_tagname_ = 'GraphicFill'
+        elif nodeName_ == 'CssParameter':
+            obj_ = CssParameter.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.CssParameter.append(obj_)
+            obj_.original_tagname_ = 'CssParameter'
+# end class Fill
+
+
+class PointSymbolizer(SymbolizerType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = SymbolizerType
+    def __init__(self, Geometry=None, Graphic=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("PointSymbolizer"), self).__init__( **kwargs_)
+        self.Geometry = Geometry
+        self.Geometry_nsprefix_ = "sld"
+        self.Graphic = Graphic
+        self.Graphic_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PointSymbolizer)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PointSymbolizer.subclass:
+            return PointSymbolizer.subclass(*args_, **kwargs_)
+        else:
+            return PointSymbolizer(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Geometry(self):
+        return self.Geometry
+    def set_Geometry(self, Geometry):
+        self.Geometry = Geometry
+    GeometryProp = property(get_Geometry, set_Geometry)
+    def get_Graphic(self):
+        return self.Graphic
+    def set_Graphic(self, Graphic):
+        self.Graphic = Graphic
+    GraphicProp = property(get_Graphic, set_Graphic)
+    def _hasContent(self):
+        if (
+            self.Geometry is not None or
+            self.Graphic is not None or
+            super(PointSymbolizer, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='PointSymbolizer', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PointSymbolizer')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PointSymbolizer':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PointSymbolizer')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PointSymbolizer', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PointSymbolizer'):
+        super(PointSymbolizer, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PointSymbolizer')
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='PointSymbolizer', fromsubclass_=False, pretty_print=True):
+        super(PointSymbolizer, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Geometry is not None:
+            namespaceprefix_ = self.Geometry_nsprefix_ + ':' if (UseCapturedNS_ and self.Geometry_nsprefix_) else ''
+            self.Geometry.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Geometry', pretty_print=pretty_print)
+        if self.Graphic is not None:
+            namespaceprefix_ = self.Graphic_nsprefix_ + ':' if (UseCapturedNS_ and self.Graphic_nsprefix_) else ''
+            self.Graphic.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Graphic', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(PointSymbolizer, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Geometry':
+            obj_ = Geometry.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Geometry = obj_
+            obj_.original_tagname_ = 'Geometry'
+        elif nodeName_ == 'Graphic':
+            obj_ = Graphic.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Graphic = obj_
+            obj_.original_tagname_ = 'Graphic'
+        super(PointSymbolizer, self)._buildChildren(child_, node, nodeName_, True)
+# end class PointSymbolizer
+
+
+class Graphic(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, ExternalGraphic=None, Mark=None, Opacity=None, Size=None, Rotation=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        if ExternalGraphic is None:
+            self.ExternalGraphic = []
+        else:
+            self.ExternalGraphic = ExternalGraphic
+        self.ExternalGraphic_nsprefix_ = "sld"
+        if Mark is None:
+            self.Mark = []
+        else:
+            self.Mark = Mark
+        self.Mark_nsprefix_ = "sld"
+        self.Opacity = Opacity
+        self.Opacity_nsprefix_ = "sld"
+        self.Size = Size
+        self.Size_nsprefix_ = "sld"
+        self.Rotation = Rotation
+        self.Rotation_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Graphic)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Graphic.subclass:
+            return Graphic.subclass(*args_, **kwargs_)
+        else:
+            return Graphic(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_ExternalGraphic(self):
+        return self.ExternalGraphic
+    def set_ExternalGraphic(self, ExternalGraphic):
+        self.ExternalGraphic = ExternalGraphic
+    def add_ExternalGraphic(self, value):
+        self.ExternalGraphic.append(value)
+    def insert_ExternalGraphic_at(self, index, value):
+        self.ExternalGraphic.insert(index, value)
+    def replace_ExternalGraphic_at(self, index, value):
+        self.ExternalGraphic[index] = value
+    ExternalGraphicProp = property(get_ExternalGraphic, set_ExternalGraphic)
+    def get_Mark(self):
+        return self.Mark
+    def set_Mark(self, Mark):
+        self.Mark = Mark
+    def add_Mark(self, value):
+        self.Mark.append(value)
+    def insert_Mark_at(self, index, value):
+        self.Mark.insert(index, value)
+    def replace_Mark_at(self, index, value):
+        self.Mark[index] = value
+    MarkProp = property(get_Mark, set_Mark)
+    def get_Opacity(self):
+        return self.Opacity
+    def set_Opacity(self, Opacity):
+        self.Opacity = Opacity
+    OpacityProp = property(get_Opacity, set_Opacity)
+    def get_Size(self):
+        return self.Size
+    def set_Size(self, Size):
+        self.Size = Size
+    SizeProp = property(get_Size, set_Size)
+    def get_Rotation(self):
+        return self.Rotation
+    def set_Rotation(self, Rotation):
+        self.Rotation = Rotation
+    RotationProp = property(get_Rotation, set_Rotation)
+    def _hasContent(self):
+        if (
+            self.ExternalGraphic or
+            self.Mark or
+            self.Opacity is not None or
+            self.Size is not None or
+            self.Rotation is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Graphic', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Graphic')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Graphic':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Graphic')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Graphic', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Graphic'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Graphic', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for ExternalGraphic_ in self.ExternalGraphic:
+            namespaceprefix_ = self.ExternalGraphic_nsprefix_ + ':' if (UseCapturedNS_ and self.ExternalGraphic_nsprefix_) else ''
+            ExternalGraphic_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ExternalGraphic', pretty_print=pretty_print)
+        for Mark_ in self.Mark:
+            namespaceprefix_ = self.Mark_nsprefix_ + ':' if (UseCapturedNS_ and self.Mark_nsprefix_) else ''
+            Mark_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Mark', pretty_print=pretty_print)
+        if self.Opacity is not None:
+            namespaceprefix_ = self.Opacity_nsprefix_ + ':' if (UseCapturedNS_ and self.Opacity_nsprefix_) else ''
+            self.Opacity.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Opacity', pretty_print=pretty_print)
+        if self.Size is not None:
+            namespaceprefix_ = self.Size_nsprefix_ + ':' if (UseCapturedNS_ and self.Size_nsprefix_) else ''
+            self.Size.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Size', pretty_print=pretty_print)
+        if self.Rotation is not None:
+            namespaceprefix_ = self.Rotation_nsprefix_ + ':' if (UseCapturedNS_ and self.Rotation_nsprefix_) else ''
+            self.Rotation.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Rotation', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'ExternalGraphic':
+            obj_ = ExternalGraphic.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ExternalGraphic.append(obj_)
+            obj_.original_tagname_ = 'ExternalGraphic'
+        elif nodeName_ == 'Mark':
+            obj_ = Mark.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Mark.append(obj_)
+            obj_.original_tagname_ = 'Mark'
+        elif nodeName_ == 'Opacity':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Opacity = obj_
+            obj_.original_tagname_ = 'Opacity'
+        elif nodeName_ == 'Size':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Size = obj_
+            obj_.original_tagname_ = 'Size'
+        elif nodeName_ == 'Rotation':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Rotation = obj_
+            obj_.original_tagname_ = 'Rotation'
+# end class Graphic
+
+
+class ExternalGraphic(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, OnlineResource=None, Format=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.OnlineResource = OnlineResource
+        self.OnlineResource_nsprefix_ = "sld"
+        self.Format = Format
+        self.Format_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ExternalGraphic)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ExternalGraphic.subclass:
+            return ExternalGraphic.subclass(*args_, **kwargs_)
+        else:
+            return ExternalGraphic(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_OnlineResource(self):
+        return self.OnlineResource
+    def set_OnlineResource(self, OnlineResource):
+        self.OnlineResource = OnlineResource
+    OnlineResourceProp = property(get_OnlineResource, set_OnlineResource)
+    def get_Format(self):
+        return self.Format
+    def set_Format(self, Format):
+        self.Format = Format
+    FormatProp = property(get_Format, set_Format)
+    def _hasContent(self):
+        if (
+            self.OnlineResource is not None or
+            self.Format is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ExternalGraphic', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ExternalGraphic')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ExternalGraphic':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ExternalGraphic')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ExternalGraphic', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ExternalGraphic'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ExternalGraphic', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.OnlineResource is not None:
+            namespaceprefix_ = self.OnlineResource_nsprefix_ + ':' if (UseCapturedNS_ and self.OnlineResource_nsprefix_) else ''
+            self.OnlineResource.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='OnlineResource', pretty_print=pretty_print)
+        if self.Format is not None:
+            namespaceprefix_ = self.Format_nsprefix_ + ':' if (UseCapturedNS_ and self.Format_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sFormat>%s</%sFormat>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Format), input_name='Format')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'OnlineResource':
+            obj_ = OnlineResource.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.OnlineResource = obj_
+            obj_.original_tagname_ = 'OnlineResource'
+        elif nodeName_ == 'Format':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Format')
+            value_ = self.gds_validate_string(value_, node, 'Format')
+            self.Format = value_
+            self.Format_nsprefix_ = child_.prefix
+# end class ExternalGraphic
+
+
+class Mark(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, WellKnownName=None, Fill=None, Stroke=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.WellKnownName = WellKnownName
+        self.WellKnownName_nsprefix_ = "sld"
+        self.Fill = Fill
+        self.Fill_nsprefix_ = "sld"
+        self.Stroke = Stroke
+        self.Stroke_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Mark)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Mark.subclass:
+            return Mark.subclass(*args_, **kwargs_)
+        else:
+            return Mark(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_WellKnownName(self):
+        return self.WellKnownName
+    def set_WellKnownName(self, WellKnownName):
+        self.WellKnownName = WellKnownName
+    WellKnownNameProp = property(get_WellKnownName, set_WellKnownName)
+    def get_Fill(self):
+        return self.Fill
+    def set_Fill(self, Fill):
+        self.Fill = Fill
+    FillProp = property(get_Fill, set_Fill)
+    def get_Stroke(self):
+        return self.Stroke
+    def set_Stroke(self, Stroke):
+        self.Stroke = Stroke
+    StrokeProp = property(get_Stroke, set_Stroke)
+    def _hasContent(self):
+        if (
+            self.WellKnownName is not None or
+            self.Fill is not None or
+            self.Stroke is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Mark', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Mark')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Mark':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Mark')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Mark', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Mark'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Mark', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.WellKnownName is not None:
+            namespaceprefix_ = self.WellKnownName_nsprefix_ + ':' if (UseCapturedNS_ and self.WellKnownName_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sWellKnownName>%s</%sWellKnownName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.WellKnownName), input_name='WellKnownName')), namespaceprefix_ , eol_))
+        if self.Fill is not None:
+            namespaceprefix_ = self.Fill_nsprefix_ + ':' if (UseCapturedNS_ and self.Fill_nsprefix_) else ''
+            self.Fill.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Fill', pretty_print=pretty_print)
+        if self.Stroke is not None:
+            namespaceprefix_ = self.Stroke_nsprefix_ + ':' if (UseCapturedNS_ and self.Stroke_nsprefix_) else ''
+            self.Stroke.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Stroke', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'WellKnownName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'WellKnownName')
+            value_ = self.gds_validate_string(value_, node, 'WellKnownName')
+            self.WellKnownName = value_
+            self.WellKnownName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Fill':
+            obj_ = Fill.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Fill = obj_
+            obj_.original_tagname_ = 'Fill'
+        elif nodeName_ == 'Stroke':
+            obj_ = Stroke.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Stroke = obj_
+            obj_.original_tagname_ = 'Stroke'
+# end class Mark
+
+
+class TextSymbolizer(SymbolizerType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = SymbolizerType
+    def __init__(self, Geometry=None, Label=None, Font=None, LabelPlacement=None, Halo=None, Fill=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("TextSymbolizer"), self).__init__( **kwargs_)
+        self.Geometry = Geometry
+        self.Geometry_nsprefix_ = "sld"
+        self.Label = Label
+        self.Label_nsprefix_ = "sld"
+        self.Font = Font
+        self.Font_nsprefix_ = "sld"
+        self.LabelPlacement = LabelPlacement
+        self.LabelPlacement_nsprefix_ = "sld"
+        self.Halo = Halo
+        self.Halo_nsprefix_ = "sld"
+        self.Fill = Fill
+        self.Fill_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, TextSymbolizer)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if TextSymbolizer.subclass:
+            return TextSymbolizer.subclass(*args_, **kwargs_)
+        else:
+            return TextSymbolizer(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Geometry(self):
+        return self.Geometry
+    def set_Geometry(self, Geometry):
+        self.Geometry = Geometry
+    GeometryProp = property(get_Geometry, set_Geometry)
+    def get_Label(self):
+        return self.Label
+    def set_Label(self, Label):
+        self.Label = Label
+    LabelProp = property(get_Label, set_Label)
+    def get_Font(self):
+        return self.Font
+    def set_Font(self, Font):
+        self.Font = Font
+    FontProp = property(get_Font, set_Font)
+    def get_LabelPlacement(self):
+        return self.LabelPlacement
+    def set_LabelPlacement(self, LabelPlacement):
+        self.LabelPlacement = LabelPlacement
+    LabelPlacementProp = property(get_LabelPlacement, set_LabelPlacement)
+    def get_Halo(self):
+        return self.Halo
+    def set_Halo(self, Halo):
+        self.Halo = Halo
+    HaloProp = property(get_Halo, set_Halo)
+    def get_Fill(self):
+        return self.Fill
+    def set_Fill(self, Fill):
+        self.Fill = Fill
+    FillProp = property(get_Fill, set_Fill)
+    def _hasContent(self):
+        if (
+            self.Geometry is not None or
+            self.Label is not None or
+            self.Font is not None or
+            self.LabelPlacement is not None or
+            self.Halo is not None or
+            self.Fill is not None or
+            super(TextSymbolizer, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='TextSymbolizer', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('TextSymbolizer')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'TextSymbolizer':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='TextSymbolizer')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='TextSymbolizer', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='TextSymbolizer'):
+        super(TextSymbolizer, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='TextSymbolizer')
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='TextSymbolizer', fromsubclass_=False, pretty_print=True):
+        super(TextSymbolizer, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Geometry is not None:
+            namespaceprefix_ = self.Geometry_nsprefix_ + ':' if (UseCapturedNS_ and self.Geometry_nsprefix_) else ''
+            self.Geometry.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Geometry', pretty_print=pretty_print)
+        if self.Label is not None:
+            namespaceprefix_ = self.Label_nsprefix_ + ':' if (UseCapturedNS_ and self.Label_nsprefix_) else ''
+            self.Label.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Label', pretty_print=pretty_print)
+        if self.Font is not None:
+            namespaceprefix_ = self.Font_nsprefix_ + ':' if (UseCapturedNS_ and self.Font_nsprefix_) else ''
+            self.Font.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Font', pretty_print=pretty_print)
+        if self.LabelPlacement is not None:
+            namespaceprefix_ = self.LabelPlacement_nsprefix_ + ':' if (UseCapturedNS_ and self.LabelPlacement_nsprefix_) else ''
+            self.LabelPlacement.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='LabelPlacement', pretty_print=pretty_print)
+        if self.Halo is not None:
+            namespaceprefix_ = self.Halo_nsprefix_ + ':' if (UseCapturedNS_ and self.Halo_nsprefix_) else ''
+            self.Halo.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Halo', pretty_print=pretty_print)
+        if self.Fill is not None:
+            namespaceprefix_ = self.Fill_nsprefix_ + ':' if (UseCapturedNS_ and self.Fill_nsprefix_) else ''
+            self.Fill.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Fill', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(TextSymbolizer, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Geometry':
+            obj_ = Geometry.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Geometry = obj_
+            obj_.original_tagname_ = 'Geometry'
+        elif nodeName_ == 'Label':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Label = obj_
+            obj_.original_tagname_ = 'Label'
+        elif nodeName_ == 'Font':
+            obj_ = Font.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Font = obj_
+            obj_.original_tagname_ = 'Font'
+        elif nodeName_ == 'LabelPlacement':
+            obj_ = LabelPlacement.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LabelPlacement = obj_
+            obj_.original_tagname_ = 'LabelPlacement'
+        elif nodeName_ == 'Halo':
+            obj_ = Halo.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Halo = obj_
+            obj_.original_tagname_ = 'Halo'
+        elif nodeName_ == 'Fill':
+            obj_ = Fill.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Fill = obj_
+            obj_.original_tagname_ = 'Fill'
+        super(TextSymbolizer, self)._buildChildren(child_, node, nodeName_, True)
+# end class TextSymbolizer
+
+
+class Font(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, CssParameter=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        if CssParameter is None:
+            self.CssParameter = []
+        else:
+            self.CssParameter = CssParameter
+        self.CssParameter_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Font)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Font.subclass:
+            return Font.subclass(*args_, **kwargs_)
+        else:
+            return Font(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_CssParameter(self):
+        return self.CssParameter
+    def set_CssParameter(self, CssParameter):
+        self.CssParameter = CssParameter
+    def add_CssParameter(self, value):
+        self.CssParameter.append(value)
+    def insert_CssParameter_at(self, index, value):
+        self.CssParameter.insert(index, value)
+    def replace_CssParameter_at(self, index, value):
+        self.CssParameter[index] = value
+    CssParameterProp = property(get_CssParameter, set_CssParameter)
+    def _hasContent(self):
+        if (
+            self.CssParameter
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Font', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Font')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Font':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Font')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Font', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Font'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Font', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for CssParameter_ in self.CssParameter:
+            namespaceprefix_ = self.CssParameter_nsprefix_ + ':' if (UseCapturedNS_ and self.CssParameter_nsprefix_) else ''
+            CssParameter_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='CssParameter', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'CssParameter':
+            obj_ = CssParameter.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.CssParameter.append(obj_)
+            obj_.original_tagname_ = 'CssParameter'
+# end class Font
+
+
+class LabelPlacement(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, PointPlacement=None, LinePlacement=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.PointPlacement = PointPlacement
+        self.PointPlacement_nsprefix_ = "sld"
+        self.LinePlacement = LinePlacement
+        self.LinePlacement_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LabelPlacement)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LabelPlacement.subclass:
+            return LabelPlacement.subclass(*args_, **kwargs_)
+        else:
+            return LabelPlacement(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PointPlacement(self):
+        return self.PointPlacement
+    def set_PointPlacement(self, PointPlacement):
+        self.PointPlacement = PointPlacement
+    PointPlacementProp = property(get_PointPlacement, set_PointPlacement)
+    def get_LinePlacement(self):
+        return self.LinePlacement
+    def set_LinePlacement(self, LinePlacement):
+        self.LinePlacement = LinePlacement
+    LinePlacementProp = property(get_LinePlacement, set_LinePlacement)
+    def _hasContent(self):
+        if (
+            self.PointPlacement is not None or
+            self.LinePlacement is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LabelPlacement', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LabelPlacement')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LabelPlacement':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LabelPlacement')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LabelPlacement', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='LabelPlacement'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LabelPlacement', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.PointPlacement is not None:
+            namespaceprefix_ = self.PointPlacement_nsprefix_ + ':' if (UseCapturedNS_ and self.PointPlacement_nsprefix_) else ''
+            self.PointPlacement.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='PointPlacement', pretty_print=pretty_print)
+        if self.LinePlacement is not None:
+            namespaceprefix_ = self.LinePlacement_nsprefix_ + ':' if (UseCapturedNS_ and self.LinePlacement_nsprefix_) else ''
+            self.LinePlacement.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='LinePlacement', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PointPlacement':
+            obj_ = PointPlacement.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PointPlacement = obj_
+            obj_.original_tagname_ = 'PointPlacement'
+        elif nodeName_ == 'LinePlacement':
+            obj_ = LinePlacement.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LinePlacement = obj_
+            obj_.original_tagname_ = 'LinePlacement'
+# end class LabelPlacement
+
+
+class PointPlacement(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, AnchorPoint=None, Displacement=None, Rotation=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.AnchorPoint = AnchorPoint
+        self.AnchorPoint_nsprefix_ = "sld"
+        self.Displacement = Displacement
+        self.Displacement_nsprefix_ = "sld"
+        self.Rotation = Rotation
+        self.Rotation_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PointPlacement)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PointPlacement.subclass:
+            return PointPlacement.subclass(*args_, **kwargs_)
+        else:
+            return PointPlacement(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_AnchorPoint(self):
+        return self.AnchorPoint
+    def set_AnchorPoint(self, AnchorPoint):
+        self.AnchorPoint = AnchorPoint
+    AnchorPointProp = property(get_AnchorPoint, set_AnchorPoint)
+    def get_Displacement(self):
+        return self.Displacement
+    def set_Displacement(self, Displacement):
+        self.Displacement = Displacement
+    DisplacementProp = property(get_Displacement, set_Displacement)
+    def get_Rotation(self):
+        return self.Rotation
+    def set_Rotation(self, Rotation):
+        self.Rotation = Rotation
+    RotationProp = property(get_Rotation, set_Rotation)
+    def _hasContent(self):
+        if (
+            self.AnchorPoint is not None or
+            self.Displacement is not None or
+            self.Rotation is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='PointPlacement', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PointPlacement')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PointPlacement':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PointPlacement')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PointPlacement', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PointPlacement'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='PointPlacement', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.AnchorPoint is not None:
+            namespaceprefix_ = self.AnchorPoint_nsprefix_ + ':' if (UseCapturedNS_ and self.AnchorPoint_nsprefix_) else ''
+            self.AnchorPoint.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='AnchorPoint', pretty_print=pretty_print)
+        if self.Displacement is not None:
+            namespaceprefix_ = self.Displacement_nsprefix_ + ':' if (UseCapturedNS_ and self.Displacement_nsprefix_) else ''
+            self.Displacement.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Displacement', pretty_print=pretty_print)
+        if self.Rotation is not None:
+            namespaceprefix_ = self.Rotation_nsprefix_ + ':' if (UseCapturedNS_ and self.Rotation_nsprefix_) else ''
+            self.Rotation.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Rotation', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'AnchorPoint':
+            obj_ = AnchorPoint.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.AnchorPoint = obj_
+            obj_.original_tagname_ = 'AnchorPoint'
+        elif nodeName_ == 'Displacement':
+            obj_ = Displacement.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Displacement = obj_
+            obj_.original_tagname_ = 'Displacement'
+        elif nodeName_ == 'Rotation':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Rotation = obj_
+            obj_.original_tagname_ = 'Rotation'
+# end class PointPlacement
+
+
+class AnchorPoint(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, AnchorPointX=None, AnchorPointY=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.AnchorPointX = AnchorPointX
+        self.AnchorPointX_nsprefix_ = "sld"
+        self.AnchorPointY = AnchorPointY
+        self.AnchorPointY_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, AnchorPoint)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if AnchorPoint.subclass:
+            return AnchorPoint.subclass(*args_, **kwargs_)
+        else:
+            return AnchorPoint(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_AnchorPointX(self):
+        return self.AnchorPointX
+    def set_AnchorPointX(self, AnchorPointX):
+        self.AnchorPointX = AnchorPointX
+    AnchorPointXProp = property(get_AnchorPointX, set_AnchorPointX)
+    def get_AnchorPointY(self):
+        return self.AnchorPointY
+    def set_AnchorPointY(self, AnchorPointY):
+        self.AnchorPointY = AnchorPointY
+    AnchorPointYProp = property(get_AnchorPointY, set_AnchorPointY)
+    def _hasContent(self):
+        if (
+            self.AnchorPointX is not None or
+            self.AnchorPointY is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='AnchorPoint', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('AnchorPoint')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'AnchorPoint':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='AnchorPoint')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='AnchorPoint', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='AnchorPoint'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='AnchorPoint', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.AnchorPointX is not None:
+            namespaceprefix_ = self.AnchorPointX_nsprefix_ + ':' if (UseCapturedNS_ and self.AnchorPointX_nsprefix_) else ''
+            self.AnchorPointX.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='AnchorPointX', pretty_print=pretty_print)
+        if self.AnchorPointY is not None:
+            namespaceprefix_ = self.AnchorPointY_nsprefix_ + ':' if (UseCapturedNS_ and self.AnchorPointY_nsprefix_) else ''
+            self.AnchorPointY.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='AnchorPointY', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'AnchorPointX':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.AnchorPointX = obj_
+            obj_.original_tagname_ = 'AnchorPointX'
+        elif nodeName_ == 'AnchorPointY':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.AnchorPointY = obj_
+            obj_.original_tagname_ = 'AnchorPointY'
+# end class AnchorPoint
+
+
+class Displacement(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, DisplacementX=None, DisplacementY=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.DisplacementX = DisplacementX
+        self.DisplacementX_nsprefix_ = "sld"
+        self.DisplacementY = DisplacementY
+        self.DisplacementY_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Displacement)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Displacement.subclass:
+            return Displacement.subclass(*args_, **kwargs_)
+        else:
+            return Displacement(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_DisplacementX(self):
+        return self.DisplacementX
+    def set_DisplacementX(self, DisplacementX):
+        self.DisplacementX = DisplacementX
+    DisplacementXProp = property(get_DisplacementX, set_DisplacementX)
+    def get_DisplacementY(self):
+        return self.DisplacementY
+    def set_DisplacementY(self, DisplacementY):
+        self.DisplacementY = DisplacementY
+    DisplacementYProp = property(get_DisplacementY, set_DisplacementY)
+    def _hasContent(self):
+        if (
+            self.DisplacementX is not None or
+            self.DisplacementY is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Displacement', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Displacement')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Displacement':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Displacement')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Displacement', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Displacement'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Displacement', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.DisplacementX is not None:
+            namespaceprefix_ = self.DisplacementX_nsprefix_ + ':' if (UseCapturedNS_ and self.DisplacementX_nsprefix_) else ''
+            self.DisplacementX.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='DisplacementX', pretty_print=pretty_print)
+        if self.DisplacementY is not None:
+            namespaceprefix_ = self.DisplacementY_nsprefix_ + ':' if (UseCapturedNS_ and self.DisplacementY_nsprefix_) else ''
+            self.DisplacementY.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='DisplacementY', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'DisplacementX':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.DisplacementX = obj_
+            obj_.original_tagname_ = 'DisplacementX'
+        elif nodeName_ == 'DisplacementY':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.DisplacementY = obj_
+            obj_.original_tagname_ = 'DisplacementY'
+# end class Displacement
+
+
+class LinePlacement(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, PerpendicularOffset=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.PerpendicularOffset = PerpendicularOffset
+        self.PerpendicularOffset_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LinePlacement)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LinePlacement.subclass:
+            return LinePlacement.subclass(*args_, **kwargs_)
+        else:
+            return LinePlacement(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PerpendicularOffset(self):
+        return self.PerpendicularOffset
+    def set_PerpendicularOffset(self, PerpendicularOffset):
+        self.PerpendicularOffset = PerpendicularOffset
+    PerpendicularOffsetProp = property(get_PerpendicularOffset, set_PerpendicularOffset)
+    def _hasContent(self):
+        if (
+            self.PerpendicularOffset is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LinePlacement', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LinePlacement')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LinePlacement':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LinePlacement')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LinePlacement', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='LinePlacement'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LinePlacement', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.PerpendicularOffset is not None:
+            namespaceprefix_ = self.PerpendicularOffset_nsprefix_ + ':' if (UseCapturedNS_ and self.PerpendicularOffset_nsprefix_) else ''
+            self.PerpendicularOffset.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='PerpendicularOffset', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PerpendicularOffset':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PerpendicularOffset = obj_
+            obj_.original_tagname_ = 'PerpendicularOffset'
+# end class LinePlacement
+
+
+class Halo(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Radius=None, Fill=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Radius = Radius
+        self.Radius_nsprefix_ = "sld"
+        self.Fill = Fill
+        self.Fill_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Halo)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Halo.subclass:
+            return Halo.subclass(*args_, **kwargs_)
+        else:
+            return Halo(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Radius(self):
+        return self.Radius
+    def set_Radius(self, Radius):
+        self.Radius = Radius
+    RadiusProp = property(get_Radius, set_Radius)
+    def get_Fill(self):
+        return self.Fill
+    def set_Fill(self, Fill):
+        self.Fill = Fill
+    FillProp = property(get_Fill, set_Fill)
+    def _hasContent(self):
+        if (
+            self.Radius is not None or
+            self.Fill is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Halo', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Halo')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Halo':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Halo')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Halo', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Halo'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Halo', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Radius is not None:
+            namespaceprefix_ = self.Radius_nsprefix_ + ':' if (UseCapturedNS_ and self.Radius_nsprefix_) else ''
+            self.Radius.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Radius', pretty_print=pretty_print)
+        if self.Fill is not None:
+            namespaceprefix_ = self.Fill_nsprefix_ + ':' if (UseCapturedNS_ and self.Fill_nsprefix_) else ''
+            self.Fill.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Fill', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Radius':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Radius = obj_
+            obj_.original_tagname_ = 'Radius'
+        elif nodeName_ == 'Fill':
+            obj_ = Fill.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Fill = obj_
+            obj_.original_tagname_ = 'Fill'
+# end class Halo
+
+
+class RasterSymbolizer(SymbolizerType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = SymbolizerType
+    def __init__(self, Geometry=None, Opacity=None, ChannelSelection=None, OverlapBehavior=None, ColorMap=None, ContrastEnhancement=None, ShadedRelief=None, ImageOutline=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("RasterSymbolizer"), self).__init__( **kwargs_)
+        self.Geometry = Geometry
+        self.Geometry_nsprefix_ = "sld"
+        self.Opacity = Opacity
+        self.Opacity_nsprefix_ = "sld"
+        self.ChannelSelection = ChannelSelection
+        self.ChannelSelection_nsprefix_ = "sld"
+        self.OverlapBehavior = OverlapBehavior
+        self.OverlapBehavior_nsprefix_ = "sld"
+        self.ColorMap = ColorMap
+        self.ColorMap_nsprefix_ = "sld"
+        self.ContrastEnhancement = ContrastEnhancement
+        self.ContrastEnhancement_nsprefix_ = "sld"
+        self.ShadedRelief = ShadedRelief
+        self.ShadedRelief_nsprefix_ = "sld"
+        self.ImageOutline = ImageOutline
+        self.ImageOutline_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, RasterSymbolizer)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if RasterSymbolizer.subclass:
+            return RasterSymbolizer.subclass(*args_, **kwargs_)
+        else:
+            return RasterSymbolizer(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Geometry(self):
+        return self.Geometry
+    def set_Geometry(self, Geometry):
+        self.Geometry = Geometry
+    GeometryProp = property(get_Geometry, set_Geometry)
+    def get_Opacity(self):
+        return self.Opacity
+    def set_Opacity(self, Opacity):
+        self.Opacity = Opacity
+    OpacityProp = property(get_Opacity, set_Opacity)
+    def get_ChannelSelection(self):
+        return self.ChannelSelection
+    def set_ChannelSelection(self, ChannelSelection):
+        self.ChannelSelection = ChannelSelection
+    ChannelSelectionProp = property(get_ChannelSelection, set_ChannelSelection)
+    def get_OverlapBehavior(self):
+        return self.OverlapBehavior
+    def set_OverlapBehavior(self, OverlapBehavior):
+        self.OverlapBehavior = OverlapBehavior
+    OverlapBehaviorProp = property(get_OverlapBehavior, set_OverlapBehavior)
+    def get_ColorMap(self):
+        return self.ColorMap
+    def set_ColorMap(self, ColorMap):
+        self.ColorMap = ColorMap
+    ColorMapProp = property(get_ColorMap, set_ColorMap)
+    def get_ContrastEnhancement(self):
+        return self.ContrastEnhancement
+    def set_ContrastEnhancement(self, ContrastEnhancement):
+        self.ContrastEnhancement = ContrastEnhancement
+    ContrastEnhancementProp = property(get_ContrastEnhancement, set_ContrastEnhancement)
+    def get_ShadedRelief(self):
+        return self.ShadedRelief
+    def set_ShadedRelief(self, ShadedRelief):
+        self.ShadedRelief = ShadedRelief
+    ShadedReliefProp = property(get_ShadedRelief, set_ShadedRelief)
+    def get_ImageOutline(self):
+        return self.ImageOutline
+    def set_ImageOutline(self, ImageOutline):
+        self.ImageOutline = ImageOutline
+    ImageOutlineProp = property(get_ImageOutline, set_ImageOutline)
+    def _hasContent(self):
+        if (
+            self.Geometry is not None or
+            self.Opacity is not None or
+            self.ChannelSelection is not None or
+            self.OverlapBehavior is not None or
+            self.ColorMap is not None or
+            self.ContrastEnhancement is not None or
+            self.ShadedRelief is not None or
+            self.ImageOutline is not None or
+            super(RasterSymbolizer, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='RasterSymbolizer', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('RasterSymbolizer')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'RasterSymbolizer':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='RasterSymbolizer')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='RasterSymbolizer', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='RasterSymbolizer'):
+        super(RasterSymbolizer, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='RasterSymbolizer')
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='RasterSymbolizer', fromsubclass_=False, pretty_print=True):
+        super(RasterSymbolizer, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Geometry is not None:
+            namespaceprefix_ = self.Geometry_nsprefix_ + ':' if (UseCapturedNS_ and self.Geometry_nsprefix_) else ''
+            self.Geometry.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Geometry', pretty_print=pretty_print)
+        if self.Opacity is not None:
+            namespaceprefix_ = self.Opacity_nsprefix_ + ':' if (UseCapturedNS_ and self.Opacity_nsprefix_) else ''
+            self.Opacity.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Opacity', pretty_print=pretty_print)
+        if self.ChannelSelection is not None:
+            namespaceprefix_ = self.ChannelSelection_nsprefix_ + ':' if (UseCapturedNS_ and self.ChannelSelection_nsprefix_) else ''
+            self.ChannelSelection.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ChannelSelection', pretty_print=pretty_print)
+        if self.OverlapBehavior is not None:
+            namespaceprefix_ = self.OverlapBehavior_nsprefix_ + ':' if (UseCapturedNS_ and self.OverlapBehavior_nsprefix_) else ''
+            self.OverlapBehavior.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='OverlapBehavior', pretty_print=pretty_print)
+        if self.ColorMap is not None:
+            namespaceprefix_ = self.ColorMap_nsprefix_ + ':' if (UseCapturedNS_ and self.ColorMap_nsprefix_) else ''
+            self.ColorMap.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ColorMap', pretty_print=pretty_print)
+        if self.ContrastEnhancement is not None:
+            namespaceprefix_ = self.ContrastEnhancement_nsprefix_ + ':' if (UseCapturedNS_ and self.ContrastEnhancement_nsprefix_) else ''
+            self.ContrastEnhancement.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ContrastEnhancement', pretty_print=pretty_print)
+        if self.ShadedRelief is not None:
+            namespaceprefix_ = self.ShadedRelief_nsprefix_ + ':' if (UseCapturedNS_ and self.ShadedRelief_nsprefix_) else ''
+            self.ShadedRelief.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ShadedRelief', pretty_print=pretty_print)
+        if self.ImageOutline is not None:
+            namespaceprefix_ = self.ImageOutline_nsprefix_ + ':' if (UseCapturedNS_ and self.ImageOutline_nsprefix_) else ''
+            self.ImageOutline.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ImageOutline', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(RasterSymbolizer, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Geometry':
+            obj_ = Geometry.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Geometry = obj_
+            obj_.original_tagname_ = 'Geometry'
+        elif nodeName_ == 'Opacity':
+            class_obj_ = self.get_class_obj_(child_, ParameterValueType)
+            obj_ = class_obj_.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Opacity = obj_
+            obj_.original_tagname_ = 'Opacity'
+        elif nodeName_ == 'ChannelSelection':
+            obj_ = ChannelSelection.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ChannelSelection = obj_
+            obj_.original_tagname_ = 'ChannelSelection'
+        elif nodeName_ == 'OverlapBehavior':
+            obj_ = OverlapBehavior.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.OverlapBehavior = obj_
+            obj_.original_tagname_ = 'OverlapBehavior'
+        elif nodeName_ == 'ColorMap':
+            obj_ = ColorMap.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ColorMap = obj_
+            obj_.original_tagname_ = 'ColorMap'
+        elif nodeName_ == 'ContrastEnhancement':
+            obj_ = ContrastEnhancement.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ContrastEnhancement = obj_
+            obj_.original_tagname_ = 'ContrastEnhancement'
+        elif nodeName_ == 'ShadedRelief':
+            obj_ = ShadedRelief.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ShadedRelief = obj_
+            obj_.original_tagname_ = 'ShadedRelief'
+        elif nodeName_ == 'ImageOutline':
+            obj_ = ImageOutline.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ImageOutline = obj_
+            obj_.original_tagname_ = 'ImageOutline'
+        super(RasterSymbolizer, self)._buildChildren(child_, node, nodeName_, True)
+# end class RasterSymbolizer
+
+
+class ChannelSelection(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, RedChannel=None, GreenChannel=None, BlueChannel=None, GrayChannel=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.RedChannel = RedChannel
+        self.RedChannel_nsprefix_ = "sld"
+        self.GreenChannel = GreenChannel
+        self.GreenChannel_nsprefix_ = "sld"
+        self.BlueChannel = BlueChannel
+        self.BlueChannel_nsprefix_ = "sld"
+        self.GrayChannel = GrayChannel
+        self.GrayChannel_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ChannelSelection)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ChannelSelection.subclass:
+            return ChannelSelection.subclass(*args_, **kwargs_)
+        else:
+            return ChannelSelection(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_RedChannel(self):
+        return self.RedChannel
+    def set_RedChannel(self, RedChannel):
+        self.RedChannel = RedChannel
+    RedChannelProp = property(get_RedChannel, set_RedChannel)
+    def get_GreenChannel(self):
+        return self.GreenChannel
+    def set_GreenChannel(self, GreenChannel):
+        self.GreenChannel = GreenChannel
+    GreenChannelProp = property(get_GreenChannel, set_GreenChannel)
+    def get_BlueChannel(self):
+        return self.BlueChannel
+    def set_BlueChannel(self, BlueChannel):
+        self.BlueChannel = BlueChannel
+    BlueChannelProp = property(get_BlueChannel, set_BlueChannel)
+    def get_GrayChannel(self):
+        return self.GrayChannel
+    def set_GrayChannel(self, GrayChannel):
+        self.GrayChannel = GrayChannel
+    GrayChannelProp = property(get_GrayChannel, set_GrayChannel)
+    def _hasContent(self):
+        if (
+            self.RedChannel is not None or
+            self.GreenChannel is not None or
+            self.BlueChannel is not None or
+            self.GrayChannel is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ChannelSelection', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ChannelSelection')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ChannelSelection':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ChannelSelection')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ChannelSelection', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ChannelSelection'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ChannelSelection', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.RedChannel is not None:
+            namespaceprefix_ = self.RedChannel_nsprefix_ + ':' if (UseCapturedNS_ and self.RedChannel_nsprefix_) else ''
+            self.RedChannel.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='RedChannel', pretty_print=pretty_print)
+        if self.GreenChannel is not None:
+            namespaceprefix_ = self.GreenChannel_nsprefix_ + ':' if (UseCapturedNS_ and self.GreenChannel_nsprefix_) else ''
+            self.GreenChannel.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='GreenChannel', pretty_print=pretty_print)
+        if self.BlueChannel is not None:
+            namespaceprefix_ = self.BlueChannel_nsprefix_ + ':' if (UseCapturedNS_ and self.BlueChannel_nsprefix_) else ''
+            self.BlueChannel.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='BlueChannel', pretty_print=pretty_print)
+        if self.GrayChannel is not None:
+            namespaceprefix_ = self.GrayChannel_nsprefix_ + ':' if (UseCapturedNS_ and self.GrayChannel_nsprefix_) else ''
+            self.GrayChannel.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='GrayChannel', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'RedChannel':
+            obj_ = SelectedChannelType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RedChannel = obj_
+            obj_.original_tagname_ = 'RedChannel'
+        elif nodeName_ == 'GreenChannel':
+            obj_ = SelectedChannelType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.GreenChannel = obj_
+            obj_.original_tagname_ = 'GreenChannel'
+        elif nodeName_ == 'BlueChannel':
+            obj_ = SelectedChannelType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.BlueChannel = obj_
+            obj_.original_tagname_ = 'BlueChannel'
+        elif nodeName_ == 'GrayChannel':
+            obj_ = SelectedChannelType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.GrayChannel = obj_
+            obj_.original_tagname_ = 'GrayChannel'
+# end class ChannelSelection
+
+
+class SelectedChannelType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, SourceChannelName=None, ContrastEnhancement=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.SourceChannelName = SourceChannelName
+        self.SourceChannelName_nsprefix_ = "sld"
+        self.ContrastEnhancement = ContrastEnhancement
+        self.ContrastEnhancement_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SelectedChannelType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if SelectedChannelType.subclass:
+            return SelectedChannelType.subclass(*args_, **kwargs_)
+        else:
+            return SelectedChannelType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_SourceChannelName(self):
+        return self.SourceChannelName
+    def set_SourceChannelName(self, SourceChannelName):
+        self.SourceChannelName = SourceChannelName
+    SourceChannelNameProp = property(get_SourceChannelName, set_SourceChannelName)
+    def get_ContrastEnhancement(self):
+        return self.ContrastEnhancement
+    def set_ContrastEnhancement(self, ContrastEnhancement):
+        self.ContrastEnhancement = ContrastEnhancement
+    ContrastEnhancementProp = property(get_ContrastEnhancement, set_ContrastEnhancement)
+    def _hasContent(self):
+        if (
+            self.SourceChannelName is not None or
+            self.ContrastEnhancement is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='SelectedChannelType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('SelectedChannelType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'SelectedChannelType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='SelectedChannelType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='SelectedChannelType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='SelectedChannelType'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='SelectedChannelType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.SourceChannelName is not None:
+            namespaceprefix_ = self.SourceChannelName_nsprefix_ + ':' if (UseCapturedNS_ and self.SourceChannelName_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sSourceChannelName>%s</%sSourceChannelName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.SourceChannelName), input_name='SourceChannelName')), namespaceprefix_ , eol_))
+        if self.ContrastEnhancement is not None:
+            namespaceprefix_ = self.ContrastEnhancement_nsprefix_ + ':' if (UseCapturedNS_ and self.ContrastEnhancement_nsprefix_) else ''
+            self.ContrastEnhancement.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ContrastEnhancement', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'SourceChannelName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'SourceChannelName')
+            value_ = self.gds_validate_string(value_, node, 'SourceChannelName')
+            self.SourceChannelName = value_
+            self.SourceChannelName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ContrastEnhancement':
+            obj_ = ContrastEnhancement.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ContrastEnhancement = obj_
+            obj_.original_tagname_ = 'ContrastEnhancement'
+# end class SelectedChannelType
+
+
+class OverlapBehavior(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, LATEST_ON_TOP=None, EARLIEST_ON_TOP=None, AVERAGE=None, RANDOM=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.LATEST_ON_TOP = LATEST_ON_TOP
+        self.LATEST_ON_TOP_nsprefix_ = "sld"
+        self.EARLIEST_ON_TOP = EARLIEST_ON_TOP
+        self.EARLIEST_ON_TOP_nsprefix_ = "sld"
+        self.AVERAGE = AVERAGE
+        self.AVERAGE_nsprefix_ = "sld"
+        self.RANDOM = RANDOM
+        self.RANDOM_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, OverlapBehavior)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if OverlapBehavior.subclass:
+            return OverlapBehavior.subclass(*args_, **kwargs_)
+        else:
+            return OverlapBehavior(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_LATEST_ON_TOP(self):
+        return self.LATEST_ON_TOP
+    def set_LATEST_ON_TOP(self, LATEST_ON_TOP):
+        self.LATEST_ON_TOP = LATEST_ON_TOP
+    LATEST_ON_TOPProp = property(get_LATEST_ON_TOP, set_LATEST_ON_TOP)
+    def get_EARLIEST_ON_TOP(self):
+        return self.EARLIEST_ON_TOP
+    def set_EARLIEST_ON_TOP(self, EARLIEST_ON_TOP):
+        self.EARLIEST_ON_TOP = EARLIEST_ON_TOP
+    EARLIEST_ON_TOPProp = property(get_EARLIEST_ON_TOP, set_EARLIEST_ON_TOP)
+    def get_AVERAGE(self):
+        return self.AVERAGE
+    def set_AVERAGE(self, AVERAGE):
+        self.AVERAGE = AVERAGE
+    AVERAGEProp = property(get_AVERAGE, set_AVERAGE)
+    def get_RANDOM(self):
+        return self.RANDOM
+    def set_RANDOM(self, RANDOM):
+        self.RANDOM = RANDOM
+    RANDOMProp = property(get_RANDOM, set_RANDOM)
+    def _hasContent(self):
+        if (
+            self.LATEST_ON_TOP is not None or
+            self.EARLIEST_ON_TOP is not None or
+            self.AVERAGE is not None or
+            self.RANDOM is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='OverlapBehavior', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('OverlapBehavior')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'OverlapBehavior':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='OverlapBehavior')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='OverlapBehavior', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='OverlapBehavior'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='OverlapBehavior', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.LATEST_ON_TOP is not None:
+            namespaceprefix_ = self.LATEST_ON_TOP_nsprefix_ + ':' if (UseCapturedNS_ and self.LATEST_ON_TOP_nsprefix_) else ''
+            self.LATEST_ON_TOP.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='LATEST_ON_TOP', pretty_print=pretty_print)
+        if self.EARLIEST_ON_TOP is not None:
+            namespaceprefix_ = self.EARLIEST_ON_TOP_nsprefix_ + ':' if (UseCapturedNS_ and self.EARLIEST_ON_TOP_nsprefix_) else ''
+            self.EARLIEST_ON_TOP.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='EARLIEST_ON_TOP', pretty_print=pretty_print)
+        if self.AVERAGE is not None:
+            namespaceprefix_ = self.AVERAGE_nsprefix_ + ':' if (UseCapturedNS_ and self.AVERAGE_nsprefix_) else ''
+            self.AVERAGE.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='AVERAGE', pretty_print=pretty_print)
+        if self.RANDOM is not None:
+            namespaceprefix_ = self.RANDOM_nsprefix_ + ':' if (UseCapturedNS_ and self.RANDOM_nsprefix_) else ''
+            self.RANDOM.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='RANDOM', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'LATEST_ON_TOP':
+            obj_ = LATEST_ON_TOP.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LATEST_ON_TOP = obj_
+            obj_.original_tagname_ = 'LATEST_ON_TOP'
+        elif nodeName_ == 'EARLIEST_ON_TOP':
+            obj_ = EARLIEST_ON_TOP.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.EARLIEST_ON_TOP = obj_
+            obj_.original_tagname_ = 'EARLIEST_ON_TOP'
+        elif nodeName_ == 'AVERAGE':
+            obj_ = AVERAGE.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.AVERAGE = obj_
+            obj_.original_tagname_ = 'AVERAGE'
+        elif nodeName_ == 'RANDOM':
+            obj_ = RANDOM.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RANDOM = obj_
+            obj_.original_tagname_ = 'RANDOM'
+# end class OverlapBehavior
+
+
+class LATEST_ON_TOP(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LATEST_ON_TOP)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LATEST_ON_TOP.subclass:
+            return LATEST_ON_TOP.subclass(*args_, **kwargs_)
+        else:
+            return LATEST_ON_TOP(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LATEST_ON_TOP', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LATEST_ON_TOP')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LATEST_ON_TOP':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LATEST_ON_TOP')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LATEST_ON_TOP', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='LATEST_ON_TOP'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='LATEST_ON_TOP', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class LATEST_ON_TOP
+
+
+class EARLIEST_ON_TOP(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, EARLIEST_ON_TOP)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if EARLIEST_ON_TOP.subclass:
+            return EARLIEST_ON_TOP.subclass(*args_, **kwargs_)
+        else:
+            return EARLIEST_ON_TOP(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='EARLIEST_ON_TOP', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('EARLIEST_ON_TOP')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'EARLIEST_ON_TOP':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='EARLIEST_ON_TOP')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='EARLIEST_ON_TOP', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='EARLIEST_ON_TOP'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='EARLIEST_ON_TOP', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class EARLIEST_ON_TOP
+
+
+class AVERAGE(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, AVERAGE)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if AVERAGE.subclass:
+            return AVERAGE.subclass(*args_, **kwargs_)
+        else:
+            return AVERAGE(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='AVERAGE', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('AVERAGE')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'AVERAGE':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='AVERAGE')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='AVERAGE', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='AVERAGE'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='AVERAGE', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class AVERAGE
+
+
+class RANDOM(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, RANDOM)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if RANDOM.subclass:
+            return RANDOM.subclass(*args_, **kwargs_)
+        else:
+            return RANDOM(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='RANDOM', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('RANDOM')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'RANDOM':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='RANDOM')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='RANDOM', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='RANDOM'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='RANDOM', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class RANDOM
+
+
+class ColorMap(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, ColorMapEntry=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        if ColorMapEntry is None:
+            self.ColorMapEntry = []
+        else:
+            self.ColorMapEntry = ColorMapEntry
+        self.ColorMapEntry_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ColorMap)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ColorMap.subclass:
+            return ColorMap.subclass(*args_, **kwargs_)
+        else:
+            return ColorMap(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_ColorMapEntry(self):
+        return self.ColorMapEntry
+    def set_ColorMapEntry(self, ColorMapEntry):
+        self.ColorMapEntry = ColorMapEntry
+    def add_ColorMapEntry(self, value):
+        self.ColorMapEntry.append(value)
+    def insert_ColorMapEntry_at(self, index, value):
+        self.ColorMapEntry.insert(index, value)
+    def replace_ColorMapEntry_at(self, index, value):
+        self.ColorMapEntry[index] = value
+    ColorMapEntryProp = property(get_ColorMapEntry, set_ColorMapEntry)
+    def _hasContent(self):
+        if (
+            self.ColorMapEntry
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ColorMap', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ColorMap')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ColorMap':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ColorMap')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ColorMap', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ColorMap'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ColorMap', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for ColorMapEntry_ in self.ColorMapEntry:
+            namespaceprefix_ = self.ColorMapEntry_nsprefix_ + ':' if (UseCapturedNS_ and self.ColorMapEntry_nsprefix_) else ''
+            ColorMapEntry_.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='ColorMapEntry', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'ColorMapEntry':
+            obj_ = ColorMapEntry.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ColorMapEntry.append(obj_)
+            obj_.original_tagname_ = 'ColorMapEntry'
+# end class ColorMap
+
+
+class ColorMapEntry(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, color=None, opacity=None, quantity=None, label=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.color = _cast(None, color)
+        self.color_nsprefix_ = None
+        self.opacity = _cast(float, opacity)
+        self.opacity_nsprefix_ = None
+        self.quantity = _cast(float, quantity)
+        self.quantity_nsprefix_ = None
+        self.label = _cast(None, label)
+        self.label_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ColorMapEntry)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ColorMapEntry.subclass:
+            return ColorMapEntry.subclass(*args_, **kwargs_)
+        else:
+            return ColorMapEntry(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_color(self):
+        return self.color
+    def set_color(self, color):
+        self.color = color
+    colorProp = property(get_color, set_color)
+    def get_opacity(self):
+        return self.opacity
+    def set_opacity(self, opacity):
+        self.opacity = opacity
+    opacityProp = property(get_opacity, set_opacity)
+    def get_quantity(self):
+        return self.quantity
+    def set_quantity(self, quantity):
+        self.quantity = quantity
+    quantityProp = property(get_quantity, set_quantity)
+    def get_label(self):
+        return self.label
+    def set_label(self, label):
+        self.label = label
+    labelProp = property(get_label, set_label)
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ColorMapEntry', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ColorMapEntry')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ColorMapEntry':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ColorMapEntry')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ColorMapEntry', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ColorMapEntry'):
+        if self.color is not None and 'color' not in already_processed:
+            already_processed.add('color')
+            outfile.write(' color=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.color), input_name='color')), ))
+        if self.opacity is not None and 'opacity' not in already_processed:
+            already_processed.add('opacity')
+            outfile.write(' opacity="%s"' % self.gds_format_double(self.opacity, input_name='opacity'))
+        if self.quantity is not None and 'quantity' not in already_processed:
+            already_processed.add('quantity')
+            outfile.write(' quantity="%s"' % self.gds_format_double(self.quantity, input_name='quantity'))
+        if self.label is not None and 'label' not in already_processed:
+            already_processed.add('label')
+            outfile.write(' label=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.label), input_name='label')), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ColorMapEntry', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('color', node)
+        if value is not None and 'color' not in already_processed:
+            already_processed.add('color')
+            self.color = value
+        value = find_attr_value_('opacity', node)
+        if value is not None and 'opacity' not in already_processed:
+            already_processed.add('opacity')
+            value = self.gds_parse_double(value, node, 'opacity')
+            self.opacity = value
+        value = find_attr_value_('quantity', node)
+        if value is not None and 'quantity' not in already_processed:
+            already_processed.add('quantity')
+            value = self.gds_parse_double(value, node, 'quantity')
+            self.quantity = value
+        value = find_attr_value_('label', node)
+        if value is not None and 'label' not in already_processed:
+            already_processed.add('label')
+            self.label = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class ColorMapEntry
+
+
+class ContrastEnhancement(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Normalize=None, Histogram=None, GammaValue=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Normalize = Normalize
+        self.Normalize_nsprefix_ = "sld"
+        self.Histogram = Histogram
+        self.Histogram_nsprefix_ = "sld"
+        self.GammaValue = GammaValue
+        self.GammaValue_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ContrastEnhancement)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ContrastEnhancement.subclass:
+            return ContrastEnhancement.subclass(*args_, **kwargs_)
+        else:
+            return ContrastEnhancement(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Normalize(self):
+        return self.Normalize
+    def set_Normalize(self, Normalize):
+        self.Normalize = Normalize
+    NormalizeProp = property(get_Normalize, set_Normalize)
+    def get_Histogram(self):
+        return self.Histogram
+    def set_Histogram(self, Histogram):
+        self.Histogram = Histogram
+    HistogramProp = property(get_Histogram, set_Histogram)
+    def get_GammaValue(self):
+        return self.GammaValue
+    def set_GammaValue(self, GammaValue):
+        self.GammaValue = GammaValue
+    GammaValueProp = property(get_GammaValue, set_GammaValue)
+    def _hasContent(self):
+        if (
+            self.Normalize is not None or
+            self.Histogram is not None or
+            self.GammaValue is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ContrastEnhancement', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ContrastEnhancement')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ContrastEnhancement':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ContrastEnhancement')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ContrastEnhancement', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ContrastEnhancement'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ContrastEnhancement', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Normalize is not None:
+            namespaceprefix_ = self.Normalize_nsprefix_ + ':' if (UseCapturedNS_ and self.Normalize_nsprefix_) else ''
+            self.Normalize.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Normalize', pretty_print=pretty_print)
+        if self.Histogram is not None:
+            namespaceprefix_ = self.Histogram_nsprefix_ + ':' if (UseCapturedNS_ and self.Histogram_nsprefix_) else ''
+            self.Histogram.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='Histogram', pretty_print=pretty_print)
+        if self.GammaValue is not None:
+            namespaceprefix_ = self.GammaValue_nsprefix_ + ':' if (UseCapturedNS_ and self.GammaValue_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sGammaValue>%s</%sGammaValue>%s' % (namespaceprefix_ , self.gds_format_double(self.GammaValue, input_name='GammaValue'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Normalize':
+            obj_ = Normalize.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Normalize = obj_
+            obj_.original_tagname_ = 'Normalize'
+        elif nodeName_ == 'Histogram':
+            obj_ = Histogram.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Histogram = obj_
+            obj_.original_tagname_ = 'Histogram'
+        elif nodeName_ == 'GammaValue' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'GammaValue')
+            fval_ = self.gds_validate_double(fval_, node, 'GammaValue')
+            self.GammaValue = fval_
+            self.GammaValue_nsprefix_ = child_.prefix
+# end class ContrastEnhancement
+
+
+class Normalize(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Normalize)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Normalize.subclass:
+            return Normalize.subclass(*args_, **kwargs_)
+        else:
+            return Normalize(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Normalize', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Normalize')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Normalize':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Normalize')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Normalize', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Normalize'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Normalize', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class Normalize
+
+
+class Histogram(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, Histogram)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if Histogram.subclass:
+            return Histogram.subclass(*args_, **kwargs_)
+        else:
+            return Histogram(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Histogram', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('Histogram')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'Histogram':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='Histogram')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='Histogram', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='Histogram'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='Histogram', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class Histogram
+
+
+class ShadedRelief(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, BrightnessOnly=None, ReliefFactor=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.BrightnessOnly = BrightnessOnly
+        self.BrightnessOnly_nsprefix_ = "sld"
+        self.ReliefFactor = ReliefFactor
+        self.ReliefFactor_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ShadedRelief)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ShadedRelief.subclass:
+            return ShadedRelief.subclass(*args_, **kwargs_)
+        else:
+            return ShadedRelief(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_BrightnessOnly(self):
+        return self.BrightnessOnly
+    def set_BrightnessOnly(self, BrightnessOnly):
+        self.BrightnessOnly = BrightnessOnly
+    BrightnessOnlyProp = property(get_BrightnessOnly, set_BrightnessOnly)
+    def get_ReliefFactor(self):
+        return self.ReliefFactor
+    def set_ReliefFactor(self, ReliefFactor):
+        self.ReliefFactor = ReliefFactor
+    ReliefFactorProp = property(get_ReliefFactor, set_ReliefFactor)
+    def _hasContent(self):
+        if (
+            self.BrightnessOnly is not None or
+            self.ReliefFactor is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ShadedRelief', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ShadedRelief')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ShadedRelief':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ShadedRelief')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ShadedRelief', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ShadedRelief'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ShadedRelief', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.BrightnessOnly is not None:
+            namespaceprefix_ = self.BrightnessOnly_nsprefix_ + ':' if (UseCapturedNS_ and self.BrightnessOnly_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sBrightnessOnly>%s</%sBrightnessOnly>%s' % (namespaceprefix_ , self.gds_format_boolean(self.BrightnessOnly, input_name='BrightnessOnly'), namespaceprefix_ , eol_))
+        if self.ReliefFactor is not None:
+            namespaceprefix_ = self.ReliefFactor_nsprefix_ + ':' if (UseCapturedNS_ and self.ReliefFactor_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sReliefFactor>%s</%sReliefFactor>%s' % (namespaceprefix_ , self.gds_format_double(self.ReliefFactor, input_name='ReliefFactor'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'BrightnessOnly':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'BrightnessOnly')
+            ival_ = self.gds_validate_boolean(ival_, node, 'BrightnessOnly')
+            self.BrightnessOnly = ival_
+            self.BrightnessOnly_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ReliefFactor' and child_.text:
+            sval_ = child_.text
+            fval_ = self.gds_parse_double(sval_, node, 'ReliefFactor')
+            fval_ = self.gds_validate_double(fval_, node, 'ReliefFactor')
+            self.ReliefFactor = fval_
+            self.ReliefFactor_nsprefix_ = child_.prefix
+# end class ShadedRelief
+
+
+class ImageOutline(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, LineSymbolizer=None, PolygonSymbolizer=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.LineSymbolizer = LineSymbolizer
+        self.LineSymbolizer_nsprefix_ = "sld"
+        self.PolygonSymbolizer = PolygonSymbolizer
+        self.PolygonSymbolizer_nsprefix_ = "sld"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ImageOutline)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ImageOutline.subclass:
+            return ImageOutline.subclass(*args_, **kwargs_)
+        else:
+            return ImageOutline(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_LineSymbolizer(self):
+        return self.LineSymbolizer
+    def set_LineSymbolizer(self, LineSymbolizer):
+        self.LineSymbolizer = LineSymbolizer
+    LineSymbolizerProp = property(get_LineSymbolizer, set_LineSymbolizer)
+    def get_PolygonSymbolizer(self):
+        return self.PolygonSymbolizer
+    def set_PolygonSymbolizer(self, PolygonSymbolizer):
+        self.PolygonSymbolizer = PolygonSymbolizer
+    PolygonSymbolizerProp = property(get_PolygonSymbolizer, set_PolygonSymbolizer)
+    def _hasContent(self):
+        if (
+            self.LineSymbolizer is not None or
+            self.PolygonSymbolizer is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ImageOutline', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ImageOutline')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ImageOutline':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ImageOutline')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ImageOutline', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ImageOutline'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='ImageOutline', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.LineSymbolizer is not None:
+            namespaceprefix_ = self.LineSymbolizer_nsprefix_ + ':' if (UseCapturedNS_ and self.LineSymbolizer_nsprefix_) else ''
+            self.LineSymbolizer.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='LineSymbolizer', pretty_print=pretty_print)
+        if self.PolygonSymbolizer is not None:
+            namespaceprefix_ = self.PolygonSymbolizer_nsprefix_ + ':' if (UseCapturedNS_ and self.PolygonSymbolizer_nsprefix_) else ''
+            self.PolygonSymbolizer.export(outfile, level, namespaceprefix_='sld:', namespacedef_='', name_='PolygonSymbolizer', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'LineSymbolizer':
+            obj_ = LineSymbolizer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LineSymbolizer = obj_
+            obj_.original_tagname_ = 'LineSymbolizer'
+        elif nodeName_ == 'PolygonSymbolizer':
+            obj_ = PolygonSymbolizer.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PolygonSymbolizer = obj_
+            obj_.original_tagname_ = 'PolygonSymbolizer'
+# end class ImageOutline
+
+
+class simple(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        if anytypeobjs_ is None:
+            self.anytypeobjs_ = []
+        else:
+            self.anytypeobjs_ = anytypeobjs_
+        self.valueOf_ = valueOf_
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+        self.valueOf_ = valueOf_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, simple)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if simple.subclass:
+            return simple.subclass(*args_, **kwargs_)
+        else:
+            return simple(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_anytypeobjs_(self): return self.anytypeobjs_
+    def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
+    def add_anytypeobjs_(self, value): self.anytypeobjs_.append(value)
+    def insert_anytypeobjs_(self, index, value): self._anytypeobjs_[index] = value
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.anytypeobjs_ or
+            (1 if type(self.valueOf_) in [int,float] else self.valueOf_) or
+            self.content_
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:None="http://www.w3.org/2001/XMLSchema" ', name_='simple', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('simple')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'simple':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='simple')
+        outfile.write('>')
+        self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_, pretty_print=pretty_print)
+        outfile.write(self.convert_unicode(self.valueOf_))
+        outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='xlink:', name_='simple'):
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:None="http://www.w3.org/2001/XMLSchema" ', name_='simple', fromsubclass_=False, pretty_print=True):
+        if not fromsubclass_:
+            for item_ in self.content_:
+                item_.export(outfile, level, item_.name, namespaceprefix_, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if not fromsubclass_:
+            for obj_ in self.anytypeobjs_:
+                showIndent(outfile, level, pretty_print)
+                outfile.write(str(obj_))
+                outfile.write('\n')
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
+        if node.text is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', node.text)
+            self.content_.append(obj_)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == '':
+            obj_ = __ANY__.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, '', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_'):
+              self.add_(obj_.value)
+            elif hasattr(self, 'set_'):
+              self.set_(obj_.value)
+        if not fromsubclass_ and child_.tail is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.tail)
+            self.content_.append(obj_)
+# end class simple
+
+
+class extended(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='extended', role=None, title_attr=None, title=None, resource=None, locator=None, arc=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.title_attr = _cast(None, title_attr)
+        self.title_attr_nsprefix_ = None
+        if title is None:
+            self.title = []
+        else:
+            self.title = title
+        self.title_nsprefix_ = None
+        if resource is None:
+            self.resource = []
+        else:
+            self.resource = resource
+        self.resource_nsprefix_ = None
+        if locator is None:
+            self.locator = []
+        else:
+            self.locator = locator
+        self.locator_nsprefix_ = None
+        if arc is None:
+            self.arc = []
+        else:
+            self.arc = arc
+        self.arc_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, extended)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if extended.subclass:
+            return extended.subclass(*args_, **kwargs_)
+        else:
+            return extended(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    def add_title(self, value):
+        self.title.append(value)
+    def insert_title_at(self, index, value):
+        self.title.insert(index, value)
+    def replace_title_at(self, index, value):
+        self.title[index] = value
+    titleProp = property(get_title, set_title)
+    def get_resource(self):
+        return self.resource
+    def set_resource(self, resource):
+        self.resource = resource
+    def add_resource(self, value):
+        self.resource.append(value)
+    def insert_resource_at(self, index, value):
+        self.resource.insert(index, value)
+    def replace_resource_at(self, index, value):
+        self.resource[index] = value
+    resourceProp = property(get_resource, set_resource)
+    def get_locator(self):
+        return self.locator
+    def set_locator(self, locator):
+        self.locator = locator
+    def add_locator(self, value):
+        self.locator.append(value)
+    def insert_locator_at(self, index, value):
+        self.locator.insert(index, value)
+    def replace_locator_at(self, index, value):
+        self.locator[index] = value
+    locatorProp = property(get_locator, set_locator)
+    def get_arc(self):
+        return self.arc
+    def set_arc(self, arc):
+        self.arc = arc
+    def add_arc(self, value):
+        self.arc.append(value)
+    def insert_arc_at(self, index, value):
+        self.arc.insert(index, value)
+    def replace_arc_at(self, index, value):
+        self.arc[index] = value
+    arcProp = property(get_arc, set_arc)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_title_attr(self):
+        return self.title_attr
+    def set_title_attr(self, title_attr):
+        self.title_attr = title_attr
+    title_attrProp = property(get_title_attr, set_title_attr)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def _hasContent(self):
+        if (
+            self.title or
+            self.resource or
+            self.locator or
+            self.arc
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink"', name_='extended', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('extended')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'extended':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='extended')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='extended', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='xlink:', name_='extended'):
+        if self.type_ is not None and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.title_attr is not None and 'title_attr' not in already_processed:
+            already_processed.add('title_attr')
+            outfile.write(' title=%s' % (quote_attrib(self.title_attr), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink"', name_='extended', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for title_ in self.title:
+            title_.export(outfile, level, namespaceprefix_, name_='title', namespacedef_='', pretty_print=pretty_print)
+        for resource_ in self.resource:
+            resource_.export(outfile, level, namespaceprefix_, name_='resource', namespacedef_='', pretty_print=pretty_print)
+        for locator_ in self.locator:
+            locator_.export(outfile, level, namespaceprefix_, name_='locator', namespacedef_='', pretty_print=pretty_print)
+        for arc_ in self.arc:
+            arc_.export(outfile, level, namespaceprefix_, name_='arc', namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title_attr' not in already_processed:
+            already_processed.add('title_attr')
+            self.title_attr = value
+            self.validate_titleAttrType(self.title_attr)    # validate type titleAttrType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'title':
+            obj_ = titleEltType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.title.append(obj_)
+            obj_.original_tagname_ = 'title'
+        elif nodeName_ == 'resource':
+            obj_ = resourceType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.resource.append(obj_)
+            obj_.original_tagname_ = 'resource'
+        elif nodeName_ == 'locator':
+            obj_ = locatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.locator.append(obj_)
+            obj_.original_tagname_ = 'locator'
+        elif nodeName_ == 'arc':
+            obj_ = arcType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.arc.append(obj_)
+            obj_.original_tagname_ = 'arc'
+# end class extended
+
+
+class titleEltType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='title', lang=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.lang = _cast(None, lang)
+        self.lang_nsprefix_ = None
+        if anytypeobjs_ is None:
+            self.anytypeobjs_ = []
+        else:
+            self.anytypeobjs_ = anytypeobjs_
+        self.valueOf_ = valueOf_
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+        self.valueOf_ = valueOf_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, titleEltType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if titleEltType.subclass:
+            return titleEltType.subclass(*args_, **kwargs_)
+        else:
+            return titleEltType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_anytypeobjs_(self): return self.anytypeobjs_
+    def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
+    def add_anytypeobjs_(self, value): self.anytypeobjs_.append(value)
+    def insert_anytypeobjs_(self, index, value): self._anytypeobjs_[index] = value
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_lang(self):
+        return self.lang
+    def set_lang(self, lang):
+        self.lang = lang
+    langProp = property(get_lang, set_lang)
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.anytypeobjs_ or
+            (1 if type(self.valueOf_) in [int,float] else self.valueOf_) or
+            self.content_
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:None="http://www.w3.org/2001/XMLSchema" ', name_='titleEltType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('titleEltType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'titleEltType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='titleEltType')
+        outfile.write('>')
+        self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_, pretty_print=pretty_print)
+        outfile.write(self.convert_unicode(self.valueOf_))
+        outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='xlink:', name_='titleEltType'):
+        if self.type_ is not None and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.lang is not None and 'lang' not in already_processed:
+            already_processed.add('lang')
+            outfile.write(' xml:lang=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.lang), input_name='lang')), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:None="http://www.w3.org/2001/XMLSchema" ', name_='titleEltType', fromsubclass_=False, pretty_print=True):
+        if not fromsubclass_:
+            for item_ in self.content_:
+                item_.export(outfile, level, item_.name, namespaceprefix_, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if not fromsubclass_:
+            for obj_ in self.anytypeobjs_:
+                showIndent(outfile, level, pretty_print)
+                outfile.write(str(obj_))
+                outfile.write('\n')
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
+        if node.text is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', node.text)
+            self.content_.append(obj_)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('lang', node)
+        if value is not None and 'lang' not in already_processed:
+            already_processed.add('lang')
+            self.lang = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == '':
+            obj_ = __ANY__.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, '', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_'):
+              self.add_(obj_.value)
+            elif hasattr(self, 'set_'):
+              self.set_(obj_.value)
+        if not fromsubclass_ and child_.tail is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.tail)
+            self.content_.append(obj_)
+# end class titleEltType
+
+
+class resourceType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='resource', role=None, title=None, label=None, anytypeobjs_=None, valueOf_=None, mixedclass_=None, content_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.label = _cast(None, label)
+        self.label_nsprefix_ = None
+        if anytypeobjs_ is None:
+            self.anytypeobjs_ = []
+        else:
+            self.anytypeobjs_ = anytypeobjs_
+        self.valueOf_ = valueOf_
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+        self.valueOf_ = valueOf_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, resourceType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if resourceType.subclass:
+            return resourceType.subclass(*args_, **kwargs_)
+        else:
+            return resourceType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_anytypeobjs_(self): return self.anytypeobjs_
+    def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
+    def add_anytypeobjs_(self, value): self.anytypeobjs_.append(value)
+    def insert_anytypeobjs_(self, index, value): self._anytypeobjs_[index] = value
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_label(self):
+        return self.label
+    def set_label(self, label):
+        self.label = label
+    labelProp = property(get_label, set_label)
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_labelType(self, value):
+        # Validate type xlink:labelType, a restriction on xs:NCName.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def _hasContent(self):
+        if (
+            self.anytypeobjs_ or
+            (1 if type(self.valueOf_) in [int,float] else self.valueOf_) or
+            self.content_
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:None="http://www.w3.org/2001/XMLSchema" ', name_='resourceType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('resourceType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'resourceType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='resourceType')
+        outfile.write('>')
+        self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_, pretty_print=pretty_print)
+        outfile.write(self.convert_unicode(self.valueOf_))
+        outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='xlink:', name_='resourceType'):
+        if self.type_ is not None and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.label is not None and 'label' not in already_processed:
+            already_processed.add('label')
+            outfile.write(' xlink:label=%s' % (quote_attrib(self.label), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:None="http://www.w3.org/2001/XMLSchema" ', name_='resourceType', fromsubclass_=False, pretty_print=True):
+        if not fromsubclass_:
+            for item_ in self.content_:
+                item_.export(outfile, level, item_.name, namespaceprefix_, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if not fromsubclass_:
+            for obj_ in self.anytypeobjs_:
+                showIndent(outfile, level, pretty_print)
+                outfile.write(str(obj_))
+                outfile.write('\n')
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
+        if node.text is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', node.text)
+            self.content_.append(obj_)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('label', node)
+        if value is not None and 'label' not in already_processed:
+            already_processed.add('label')
+            self.label = value
+            self.validate_labelType(self.label)    # validate type labelType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == '':
+            obj_ = __ANY__.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, '', obj_)
+            self.content_.append(obj_)
+            if hasattr(self, 'add_'):
+              self.add_(obj_.value)
+            elif hasattr(self, 'set_'):
+              self.set_(obj_.value)
+        if not fromsubclass_ and child_.tail is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.tail)
+            self.content_.append(obj_)
+# end class resourceType
+
+
+class locatorType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='locator', href=None, role=None, title_attr=None, label=None, title=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.title_attr = _cast(None, title_attr)
+        self.title_attr_nsprefix_ = None
+        self.label = _cast(None, label)
+        self.label_nsprefix_ = None
+        if title is None:
+            self.title = []
+        else:
+            self.title = title
+        self.title_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, locatorType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if locatorType.subclass:
+            return locatorType.subclass(*args_, **kwargs_)
+        else:
+            return locatorType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    def add_title(self, value):
+        self.title.append(value)
+    def insert_title_at(self, index, value):
+        self.title.insert(index, value)
+    def replace_title_at(self, index, value):
+        self.title[index] = value
+    titleProp = property(get_title, set_title)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_title_attr(self):
+        return self.title_attr
+    def set_title_attr(self, title_attr):
+        self.title_attr = title_attr
+    title_attrProp = property(get_title_attr, set_title_attr)
+    def get_label(self):
+        return self.label
+    def set_label(self, label):
+        self.label = label
+    labelProp = property(get_label, set_label)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_labelType(self, value):
+        # Validate type xlink:labelType, a restriction on xs:NCName.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def _hasContent(self):
+        if (
+            self.title
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink"', name_='locatorType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('locatorType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'locatorType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='locatorType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='locatorType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='xlink:', name_='locatorType'):
+        if self.type_ is not None and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.title_attr is not None and 'title_attr' not in already_processed:
+            already_processed.add('title_attr')
+            outfile.write(' title=%s' % (quote_attrib(self.title_attr), ))
+        if self.label is not None and 'label' not in already_processed:
+            already_processed.add('label')
+            outfile.write(' xlink:label=%s' % (quote_attrib(self.label), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink"', name_='locatorType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for title_ in self.title:
+            title_.export(outfile, level, namespaceprefix_, name_='title', namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title_attr' not in already_processed:
+            already_processed.add('title_attr')
+            self.title_attr = value
+            self.validate_titleAttrType(self.title_attr)    # validate type titleAttrType
+        value = find_attr_value_('label', node)
+        if value is not None and 'label' not in already_processed:
+            already_processed.add('label')
+            self.label = value
+            self.validate_labelType(self.label)    # validate type labelType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'title':
+            obj_ = titleEltType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.title.append(obj_)
+            obj_.original_tagname_ = 'title'
+# end class locatorType
+
+
+class arcType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='arc', arcrole=None, title_attr=None, show=None, actuate=None, from_=None, to=None, title=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title_attr = _cast(None, title_attr)
+        self.title_attr_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.from_ = _cast(None, from_)
+        self.from__nsprefix_ = None
+        self.to = _cast(None, to)
+        self.to_nsprefix_ = None
+        if title is None:
+            self.title = []
+        else:
+            self.title = title
+        self.title_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, arcType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if arcType.subclass:
+            return arcType.subclass(*args_, **kwargs_)
+        else:
+            return arcType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    def add_title(self, value):
+        self.title.append(value)
+    def insert_title_at(self, index, value):
+        self.title.insert(index, value)
+    def replace_title_at(self, index, value):
+        self.title[index] = value
+    titleProp = property(get_title, set_title)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title_attr(self):
+        return self.title_attr
+    def set_title_attr(self, title_attr):
+        self.title_attr = title_attr
+    title_attrProp = property(get_title_attr, set_title_attr)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def get_from(self):
+        return self.from_
+    def set_from(self, from_):
+        self.from_ = from_
+    fromProp = property(get_from, set_from)
+    def get_to(self):
+        return self.to
+    def set_to(self, to):
+        self.to = to
+    toProp = property(get_to, set_to)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_fromType(self, value):
+        # Validate type xlink:fromType, a restriction on xs:NCName.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_toType(self, value):
+        # Validate type xlink:toType, a restriction on xs:NCName.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def _hasContent(self):
+        if (
+            self.title
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink"', name_='arcType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('arcType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'arcType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='arcType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='arcType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='xlink:', name_='arcType'):
+        if self.type_ is not None and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title_attr is not None and 'title_attr' not in already_processed:
+            already_processed.add('title_attr')
+            outfile.write(' title=%s' % (quote_attrib(self.title_attr), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+        if self.from_ is not None and 'from_' not in already_processed:
+            already_processed.add('from_')
+            outfile.write(' xlink:from=%s' % (quote_attrib(self.from_), ))
+        if self.to is not None and 'to' not in already_processed:
+            already_processed.add('to')
+            outfile.write(' xlink:to=%s' % (quote_attrib(self.to), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='xlink:', namespacedef_='xmlns:xlink="http://www.w3.org/1999/xlink"', name_='arcType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for title_ in self.title:
+            title_.export(outfile, level, namespaceprefix_, name_='title', namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title_attr' not in already_processed:
+            already_processed.add('title_attr')
+            self.title_attr = value
+            self.validate_titleAttrType(self.title_attr)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+        value = find_attr_value_('from', node)
+        if value is not None and 'from' not in already_processed:
+            already_processed.add('from')
+            self.from_ = value
+            self.validate_fromType(self.from_)    # validate type fromType
+        value = find_attr_value_('to', node)
+        if value is not None and 'to' not in already_processed:
+            already_processed.add('to')
+            self.to = value
+            self.validate_toType(self.to)    # validate type toType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'title':
+            obj_ = titleEltType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.title.append(obj_)
+            obj_.original_tagname_ = 'title'
+# end class arcType
+
+
+class ComparisonOpsType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        self.extensiontype_ = extensiontype_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ComparisonOpsType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ComparisonOpsType.subclass:
+            return ComparisonOpsType.subclass(*args_, **kwargs_)
+        else:
+            return ComparisonOpsType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='ComparisonOpsType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ComparisonOpsType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ComparisonOpsType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ComparisonOpsType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ComparisonOpsType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='ComparisonOpsType'):
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='ComparisonOpsType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class ComparisonOpsType
+
+
+class SpatialOpsType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        self.extensiontype_ = extensiontype_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SpatialOpsType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if SpatialOpsType.subclass:
+            return SpatialOpsType.subclass(*args_, **kwargs_)
+        else:
+            return SpatialOpsType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='SpatialOpsType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('SpatialOpsType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'SpatialOpsType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='SpatialOpsType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='SpatialOpsType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='SpatialOpsType'):
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='SpatialOpsType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class SpatialOpsType
+
+
+class LogicOpsType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        self.extensiontype_ = extensiontype_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LogicOpsType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LogicOpsType.subclass:
+            return LogicOpsType.subclass(*args_, **kwargs_)
+        else:
+            return LogicOpsType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='LogicOpsType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LogicOpsType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LogicOpsType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LogicOpsType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LogicOpsType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='LogicOpsType'):
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='LogicOpsType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class LogicOpsType
+
+
+class FilterType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, spatialOps=None, comparisonOps=None, logicOps=None, FeatureId=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        self.spatialOps = spatialOps
+        self.spatialOps_nsprefix_ = "ogc"
+        self.comparisonOps = comparisonOps
+        self.comparisonOps_nsprefix_ = "ogc"
+        self.logicOps = logicOps
+        self.logicOps_nsprefix_ = "ogc"
+        if FeatureId is None:
+            self.FeatureId = []
+        else:
+            self.FeatureId = FeatureId
+        self.FeatureId_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, FilterType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if FilterType.subclass:
+            return FilterType.subclass(*args_, **kwargs_)
+        else:
+            return FilterType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_spatialOps(self):
+        return self.spatialOps
+    def set_spatialOps(self, spatialOps):
+        self.spatialOps = spatialOps
+    spatialOpsProp = property(get_spatialOps, set_spatialOps)
+    def get_comparisonOps(self):
+        return self.comparisonOps
+    def set_comparisonOps(self, comparisonOps):
+        self.comparisonOps = comparisonOps
+    comparisonOpsProp = property(get_comparisonOps, set_comparisonOps)
+    def get_logicOps(self):
+        return self.logicOps
+    def set_logicOps(self, logicOps):
+        self.logicOps = logicOps
+    logicOpsProp = property(get_logicOps, set_logicOps)
+    def get_FeatureId(self):
+        return self.FeatureId
+    def set_FeatureId(self, FeatureId):
+        self.FeatureId = FeatureId
+    def add_FeatureId(self, value):
+        self.FeatureId.append(value)
+    def insert_FeatureId_at(self, index, value):
+        self.FeatureId.insert(index, value)
+    def replace_FeatureId_at(self, index, value):
+        self.FeatureId[index] = value
+    FeatureIdProp = property(get_FeatureId, set_FeatureId)
+    def _hasContent(self):
+        if (
+            self.spatialOps is not None or
+            self.comparisonOps is not None or
+            self.logicOps is not None or
+            self.FeatureId
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='FilterType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('FilterType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'FilterType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='FilterType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='FilterType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='FilterType'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='FilterType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.spatialOps is not None:
+            self.spatialOps.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        if self.comparisonOps is not None:
+            self.comparisonOps.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        if self.logicOps is not None:
+            self.logicOps.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        for FeatureId_ in self.FeatureId:
+            namespaceprefix_ = self.FeatureId_nsprefix_ + ':' if (UseCapturedNS_ and self.FeatureId_nsprefix_) else ''
+            FeatureId_.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='FeatureId', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'spatialOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <spatialOps> element')
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'spatialOps'
+        elif nodeName_ == 'Equals':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Equals'
+        elif nodeName_ == 'Disjoint':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Disjoint'
+        elif nodeName_ == 'Touches':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Touches'
+        elif nodeName_ == 'Within':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Within'
+        elif nodeName_ == 'Overlaps':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Overlaps'
+        elif nodeName_ == 'Crosses':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Crosses'
+        elif nodeName_ == 'Intersects':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Intersects'
+        elif nodeName_ == 'Contains':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Contains'
+        elif nodeName_ == 'DWithin':
+            obj_ = DistanceBufferType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'DWithin'
+        elif nodeName_ == 'Beyond':
+            obj_ = DistanceBufferType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Beyond'
+        elif nodeName_ == 'BBOX':
+            obj_ = BBOXType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'BBOX'
+        elif nodeName_ == 'comparisonOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <comparisonOps> element')
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'comparisonOps'
+        elif nodeName_ == 'PropertyIsEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsEqualTo'
+        elif nodeName_ == 'PropertyIsNotEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsNotEqualTo'
+        elif nodeName_ == 'PropertyIsLessThan':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsLessThan'
+        elif nodeName_ == 'PropertyIsGreaterThan':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsGreaterThan'
+        elif nodeName_ == 'PropertyIsLessThanOrEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsLessThanOrEqualTo'
+        elif nodeName_ == 'PropertyIsGreaterThanOrEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsGreaterThanOrEqualTo'
+        elif nodeName_ == 'PropertyIsLike':
+            obj_ = PropertyIsLikeType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsLike'
+        elif nodeName_ == 'PropertyIsNull':
+            obj_ = PropertyIsNullType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsNull'
+        elif nodeName_ == 'PropertyIsBetween':
+            obj_ = PropertyIsBetweenType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsBetween'
+        elif nodeName_ == 'logicOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <logicOps> element')
+            self.logicOps = obj_
+            obj_.original_tagname_ = 'logicOps'
+        elif nodeName_ == 'And':
+            obj_ = BinaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps = obj_
+            obj_.original_tagname_ = 'And'
+        elif nodeName_ == 'Or':
+            obj_ = BinaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps = obj_
+            obj_.original_tagname_ = 'Or'
+        elif nodeName_ == 'Not':
+            obj_ = UnaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps = obj_
+            obj_.original_tagname_ = 'Not'
+        elif nodeName_ == 'FeatureId':
+            obj_ = FeatureIdType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.FeatureId.append(obj_)
+            obj_.original_tagname_ = 'FeatureId'
+# end class FilterType
+
+
+class FeatureIdType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, fid=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        self.fid = _cast(None, fid)
+        self.fid_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, FeatureIdType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if FeatureIdType.subclass:
+            return FeatureIdType.subclass(*args_, **kwargs_)
+        else:
+            return FeatureIdType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_fid(self):
+        return self.fid
+    def set_fid(self, fid):
+        self.fid = fid
+    fidProp = property(get_fid, set_fid)
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='FeatureIdType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('FeatureIdType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'FeatureIdType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='FeatureIdType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='FeatureIdType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='FeatureIdType'):
+        if self.fid is not None and 'fid' not in already_processed:
+            already_processed.add('fid')
+            outfile.write(' fid=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.fid), input_name='fid')), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='FeatureIdType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('fid', node)
+        if value is not None and 'fid' not in already_processed:
+            already_processed.add('fid')
+            self.fid = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class FeatureIdType
+
+
+class BinaryComparisonOpType(ComparisonOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ComparisonOpsType
+    def __init__(self, expression=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("BinaryComparisonOpType"), self).__init__( **kwargs_)
+        if expression is None:
+            self.expression = []
+        else:
+            self.expression = expression
+        self.expression_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, BinaryComparisonOpType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if BinaryComparisonOpType.subclass:
+            return BinaryComparisonOpType.subclass(*args_, **kwargs_)
+        else:
+            return BinaryComparisonOpType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_expression(self):
+        return self.expression
+    def set_expression(self, expression):
+        self.expression = expression
+    def add_expression(self, value):
+        self.expression.append(value)
+    def insert_expression_at(self, index, value):
+        self.expression.insert(index, value)
+    def replace_expression_at(self, index, value):
+        self.expression[index] = value
+    expressionProp = property(get_expression, set_expression)
+    def _hasContent(self):
+        if (
+            self.expression or
+            super(BinaryComparisonOpType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='BinaryComparisonOpType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('BinaryComparisonOpType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'BinaryComparisonOpType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BinaryComparisonOpType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='BinaryComparisonOpType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='BinaryComparisonOpType'):
+        super(BinaryComparisonOpType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BinaryComparisonOpType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='BinaryComparisonOpType', fromsubclass_=False, pretty_print=True):
+        super(BinaryComparisonOpType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for expression_ in self.expression:
+            expression_.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(BinaryComparisonOpType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'expression':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <expression> element')
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'expression'
+        elif nodeName_ == 'Add':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Add'
+        elif nodeName_ == 'Sub':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Sub'
+        elif nodeName_ == 'Mul':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Mul'
+        elif nodeName_ == 'Div':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Div'
+        elif nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Function':
+            obj_ = FunctionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Function'
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Literal'
+        super(BinaryComparisonOpType, self)._buildChildren(child_, node, nodeName_, True)
+# end class BinaryComparisonOpType
+
+
+class PropertyIsLikeType(ComparisonOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ComparisonOpsType
+    def __init__(self, wildCard=None, singleChar=None, escape=None, PropertyName=None, Literal=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("PropertyIsLikeType"), self).__init__( **kwargs_)
+        self.wildCard = _cast(None, wildCard)
+        self.wildCard_nsprefix_ = None
+        self.singleChar = _cast(None, singleChar)
+        self.singleChar_nsprefix_ = None
+        self.escape = _cast(None, escape)
+        self.escape_nsprefix_ = None
+        self.PropertyName = PropertyName
+        self.PropertyName_nsprefix_ = "ogc"
+        self.Literal = Literal
+        self.Literal_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PropertyIsLikeType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PropertyIsLikeType.subclass:
+            return PropertyIsLikeType.subclass(*args_, **kwargs_)
+        else:
+            return PropertyIsLikeType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PropertyName(self):
+        return self.PropertyName
+    def set_PropertyName(self, PropertyName):
+        self.PropertyName = PropertyName
+    PropertyNameProp = property(get_PropertyName, set_PropertyName)
+    def get_Literal(self):
+        return self.Literal
+    def set_Literal(self, Literal):
+        self.Literal = Literal
+    LiteralProp = property(get_Literal, set_Literal)
+    def get_wildCard(self):
+        return self.wildCard
+    def set_wildCard(self, wildCard):
+        self.wildCard = wildCard
+    wildCardProp = property(get_wildCard, set_wildCard)
+    def get_singleChar(self):
+        return self.singleChar
+    def set_singleChar(self, singleChar):
+        self.singleChar = singleChar
+    singleCharProp = property(get_singleChar, set_singleChar)
+    def get_escape(self):
+        return self.escape
+    def set_escape(self, escape):
+        self.escape = escape
+    escapeProp = property(get_escape, set_escape)
+    def _hasContent(self):
+        if (
+            self.PropertyName is not None or
+            self.Literal is not None or
+            super(PropertyIsLikeType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='PropertyIsLikeType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PropertyIsLikeType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PropertyIsLikeType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PropertyIsLikeType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PropertyIsLikeType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='PropertyIsLikeType'):
+        super(PropertyIsLikeType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PropertyIsLikeType')
+        if self.wildCard is not None and 'wildCard' not in already_processed:
+            already_processed.add('wildCard')
+            outfile.write(' wildCard=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.wildCard), input_name='wildCard')), ))
+        if self.singleChar is not None and 'singleChar' not in already_processed:
+            already_processed.add('singleChar')
+            outfile.write(' singleChar=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.singleChar), input_name='singleChar')), ))
+        if self.escape is not None and 'escape' not in already_processed:
+            already_processed.add('escape')
+            outfile.write(' escape=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.escape), input_name='escape')), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='PropertyIsLikeType', fromsubclass_=False, pretty_print=True):
+        super(PropertyIsLikeType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.PropertyName is not None:
+            namespaceprefix_ = self.PropertyName_nsprefix_ + ':' if (UseCapturedNS_ and self.PropertyName_nsprefix_) else ''
+            self.PropertyName.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='PropertyName', pretty_print=pretty_print)
+        if self.Literal is not None:
+            namespaceprefix_ = self.Literal_nsprefix_ + ':' if (UseCapturedNS_ and self.Literal_nsprefix_) else ''
+            self.Literal.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='Literal', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('wildCard', node)
+        if value is not None and 'wildCard' not in already_processed:
+            already_processed.add('wildCard')
+            self.wildCard = value
+        value = find_attr_value_('singleChar', node)
+        if value is not None and 'singleChar' not in already_processed:
+            already_processed.add('singleChar')
+            self.singleChar = value
+        value = find_attr_value_('escape', node)
+        if value is not None and 'escape' not in already_processed:
+            already_processed.add('escape')
+            self.escape = value
+        super(PropertyIsLikeType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PropertyName = obj_
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Literal = obj_
+            obj_.original_tagname_ = 'Literal'
+        super(PropertyIsLikeType, self)._buildChildren(child_, node, nodeName_, True)
+# end class PropertyIsLikeType
+
+
+class PropertyIsNullType(ComparisonOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ComparisonOpsType
+    def __init__(self, PropertyName=None, Literal=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("PropertyIsNullType"), self).__init__( **kwargs_)
+        self.PropertyName = PropertyName
+        self.PropertyName_nsprefix_ = "ogc"
+        self.Literal = Literal
+        self.Literal_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PropertyIsNullType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PropertyIsNullType.subclass:
+            return PropertyIsNullType.subclass(*args_, **kwargs_)
+        else:
+            return PropertyIsNullType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PropertyName(self):
+        return self.PropertyName
+    def set_PropertyName(self, PropertyName):
+        self.PropertyName = PropertyName
+    PropertyNameProp = property(get_PropertyName, set_PropertyName)
+    def get_Literal(self):
+        return self.Literal
+    def set_Literal(self, Literal):
+        self.Literal = Literal
+    LiteralProp = property(get_Literal, set_Literal)
+    def _hasContent(self):
+        if (
+            self.PropertyName is not None or
+            self.Literal is not None or
+            super(PropertyIsNullType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='PropertyIsNullType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PropertyIsNullType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PropertyIsNullType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PropertyIsNullType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PropertyIsNullType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='PropertyIsNullType'):
+        super(PropertyIsNullType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PropertyIsNullType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='PropertyIsNullType', fromsubclass_=False, pretty_print=True):
+        super(PropertyIsNullType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.PropertyName is not None:
+            namespaceprefix_ = self.PropertyName_nsprefix_ + ':' if (UseCapturedNS_ and self.PropertyName_nsprefix_) else ''
+            self.PropertyName.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='PropertyName', pretty_print=pretty_print)
+        if self.Literal is not None:
+            namespaceprefix_ = self.Literal_nsprefix_ + ':' if (UseCapturedNS_ and self.Literal_nsprefix_) else ''
+            self.Literal.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='Literal', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(PropertyIsNullType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PropertyName = obj_
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Literal = obj_
+            obj_.original_tagname_ = 'Literal'
+        super(PropertyIsNullType, self)._buildChildren(child_, node, nodeName_, True)
+# end class PropertyIsNullType
+
+
+class PropertyIsBetweenType(ComparisonOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ComparisonOpsType
+    def __init__(self, expression=None, LowerBoundary=None, UpperBoundary=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("PropertyIsBetweenType"), self).__init__( **kwargs_)
+        self.expression = expression
+        self.expression_nsprefix_ = "ogc"
+        self.LowerBoundary = LowerBoundary
+        self.LowerBoundary_nsprefix_ = "ogc"
+        self.UpperBoundary = UpperBoundary
+        self.UpperBoundary_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PropertyIsBetweenType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PropertyIsBetweenType.subclass:
+            return PropertyIsBetweenType.subclass(*args_, **kwargs_)
+        else:
+            return PropertyIsBetweenType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_expression(self):
+        return self.expression
+    def set_expression(self, expression):
+        self.expression = expression
+    expressionProp = property(get_expression, set_expression)
+    def get_LowerBoundary(self):
+        return self.LowerBoundary
+    def set_LowerBoundary(self, LowerBoundary):
+        self.LowerBoundary = LowerBoundary
+    LowerBoundaryProp = property(get_LowerBoundary, set_LowerBoundary)
+    def get_UpperBoundary(self):
+        return self.UpperBoundary
+    def set_UpperBoundary(self, UpperBoundary):
+        self.UpperBoundary = UpperBoundary
+    UpperBoundaryProp = property(get_UpperBoundary, set_UpperBoundary)
+    def _hasContent(self):
+        if (
+            self.expression is not None or
+            self.LowerBoundary is not None or
+            self.UpperBoundary is not None or
+            super(PropertyIsBetweenType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='PropertyIsBetweenType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PropertyIsBetweenType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PropertyIsBetweenType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PropertyIsBetweenType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PropertyIsBetweenType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='PropertyIsBetweenType'):
+        super(PropertyIsBetweenType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PropertyIsBetweenType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='PropertyIsBetweenType', fromsubclass_=False, pretty_print=True):
+        super(PropertyIsBetweenType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.expression is not None:
+            self.expression.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        if self.LowerBoundary is not None:
+            namespaceprefix_ = self.LowerBoundary_nsprefix_ + ':' if (UseCapturedNS_ and self.LowerBoundary_nsprefix_) else ''
+            self.LowerBoundary.export(outfile, level, namespaceprefix_, namespacedef_='', name_='LowerBoundary', pretty_print=pretty_print)
+        if self.UpperBoundary is not None:
+            namespaceprefix_ = self.UpperBoundary_nsprefix_ + ':' if (UseCapturedNS_ and self.UpperBoundary_nsprefix_) else ''
+            self.UpperBoundary.export(outfile, level, namespaceprefix_, namespacedef_='', name_='UpperBoundary', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(PropertyIsBetweenType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'expression':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <expression> element')
+            self.expression = obj_
+            obj_.original_tagname_ = 'expression'
+        elif nodeName_ == 'Add':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Add'
+        elif nodeName_ == 'Sub':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Sub'
+        elif nodeName_ == 'Mul':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Mul'
+        elif nodeName_ == 'Div':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Div'
+        elif nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Function':
+            obj_ = FunctionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Function'
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Literal'
+        elif nodeName_ == 'LowerBoundary':
+            obj_ = LowerBoundaryType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LowerBoundary = obj_
+            obj_.original_tagname_ = 'LowerBoundary'
+        elif nodeName_ == 'UpperBoundary':
+            obj_ = UpperBoundaryType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UpperBoundary = obj_
+            obj_.original_tagname_ = 'UpperBoundary'
+        super(PropertyIsBetweenType, self)._buildChildren(child_, node, nodeName_, True)
+# end class PropertyIsBetweenType
+
+
+class LowerBoundaryType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, expression=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        self.expression = expression
+        self.expression_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LowerBoundaryType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LowerBoundaryType.subclass:
+            return LowerBoundaryType.subclass(*args_, **kwargs_)
+        else:
+            return LowerBoundaryType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_expression(self):
+        return self.expression
+    def set_expression(self, expression):
+        self.expression = expression
+    expressionProp = property(get_expression, set_expression)
+    def _hasContent(self):
+        if (
+            self.expression is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='LowerBoundaryType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LowerBoundaryType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LowerBoundaryType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LowerBoundaryType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LowerBoundaryType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='LowerBoundaryType'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='LowerBoundaryType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.expression is not None:
+            self.expression.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'expression':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <expression> element')
+            self.expression = obj_
+            obj_.original_tagname_ = 'expression'
+        elif nodeName_ == 'Add':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Add'
+        elif nodeName_ == 'Sub':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Sub'
+        elif nodeName_ == 'Mul':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Mul'
+        elif nodeName_ == 'Div':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Div'
+        elif nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Function':
+            obj_ = FunctionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Function'
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Literal'
+# end class LowerBoundaryType
+
+
+class UpperBoundaryType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, expression=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        self.expression = expression
+        self.expression_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, UpperBoundaryType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if UpperBoundaryType.subclass:
+            return UpperBoundaryType.subclass(*args_, **kwargs_)
+        else:
+            return UpperBoundaryType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_expression(self):
+        return self.expression
+    def set_expression(self, expression):
+        self.expression = expression
+    expressionProp = property(get_expression, set_expression)
+    def _hasContent(self):
+        if (
+            self.expression is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='UpperBoundaryType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('UpperBoundaryType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'UpperBoundaryType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='UpperBoundaryType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='UpperBoundaryType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='UpperBoundaryType'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='UpperBoundaryType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.expression is not None:
+            self.expression.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'expression':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <expression> element')
+            self.expression = obj_
+            obj_.original_tagname_ = 'expression'
+        elif nodeName_ == 'Add':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Add'
+        elif nodeName_ == 'Sub':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Sub'
+        elif nodeName_ == 'Mul':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Mul'
+        elif nodeName_ == 'Div':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Div'
+        elif nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Function':
+            obj_ = FunctionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Function'
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression = obj_
+            obj_.original_tagname_ = 'Literal'
+# end class UpperBoundaryType
+
+
+class BinarySpatialOpType(SpatialOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = SpatialOpsType
+    def __init__(self, PropertyName=None, _Geometry=None, Box=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("BinarySpatialOpType"), self).__init__( **kwargs_)
+        self.PropertyName = PropertyName
+        self.PropertyName_nsprefix_ = "ogc"
+        self._Geometry = _Geometry
+        self._Geometry_nsprefix_ = "gml"
+        self.Box = Box
+        self.Box_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, BinarySpatialOpType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if BinarySpatialOpType.subclass:
+            return BinarySpatialOpType.subclass(*args_, **kwargs_)
+        else:
+            return BinarySpatialOpType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PropertyName(self):
+        return self.PropertyName
+    def set_PropertyName(self, PropertyName):
+        self.PropertyName = PropertyName
+    PropertyNameProp = property(get_PropertyName, set_PropertyName)
+    def get__Geometry(self):
+        return self._Geometry
+    def set__Geometry(self, _Geometry):
+        self._Geometry = _Geometry
+    _GeometryProp = property(get__Geometry, set__Geometry)
+    def get_Box(self):
+        return self.Box
+    def set_Box(self, Box):
+        self.Box = Box
+    BoxProp = property(get_Box, set_Box)
+    def _hasContent(self):
+        if (
+            self.PropertyName is not None or
+            self._Geometry is not None or
+            self.Box is not None or
+            super(BinarySpatialOpType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" ', name_='BinarySpatialOpType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('BinarySpatialOpType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'BinarySpatialOpType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BinarySpatialOpType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='BinarySpatialOpType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='BinarySpatialOpType'):
+        super(BinarySpatialOpType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BinarySpatialOpType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" ', name_='BinarySpatialOpType', fromsubclass_=False, pretty_print=True):
+        super(BinarySpatialOpType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.PropertyName is not None:
+            namespaceprefix_ = self.PropertyName_nsprefix_ + ':' if (UseCapturedNS_ and self.PropertyName_nsprefix_) else ''
+            self.PropertyName.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='PropertyName', pretty_print=pretty_print)
+        if self._Geometry is not None:
+            self._Geometry.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        if self.Box is not None:
+            namespaceprefix_ = self.Box_nsprefix_ + ':' if (UseCapturedNS_ and self.Box_nsprefix_) else ''
+            self.Box.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='Box', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(BinarySpatialOpType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PropertyName = obj_
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == '_Geometry':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <_Geometry> element')
+            self._Geometry = obj_
+            obj_.original_tagname_ = '_Geometry'
+        elif nodeName_ == '_GeometryCollection':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = '_GeometryCollection'
+        elif nodeName_ == 'Point':
+            obj_ = PointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'Point'
+        elif nodeName_ == 'LineString':
+            obj_ = LineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'LineString'
+        elif nodeName_ == 'LinearRing':
+            obj_ = LinearRingType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'LinearRing'
+        elif nodeName_ == 'Polygon':
+            obj_ = PolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'Polygon'
+        elif nodeName_ == 'MultiGeometry':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiGeometry'
+        elif nodeName_ == 'MultiPoint':
+            obj_ = MultiPointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiPoint'
+        elif nodeName_ == 'MultiLineString':
+            obj_ = MultiLineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiLineString'
+        elif nodeName_ == 'MultiPolygon':
+            obj_ = MultiPolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiPolygon'
+        elif nodeName_ == 'Box':
+            obj_ = BoxType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Box = obj_
+            obj_.original_tagname_ = 'Box'
+        super(BinarySpatialOpType, self)._buildChildren(child_, node, nodeName_, True)
+# end class BinarySpatialOpType
+
+
+class BBOXType(SpatialOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = SpatialOpsType
+    def __init__(self, PropertyName=None, Box=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("BBOXType"), self).__init__( **kwargs_)
+        self.PropertyName = PropertyName
+        self.PropertyName_nsprefix_ = "ogc"
+        self.Box = Box
+        self.Box_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, BBOXType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if BBOXType.subclass:
+            return BBOXType.subclass(*args_, **kwargs_)
+        else:
+            return BBOXType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PropertyName(self):
+        return self.PropertyName
+    def set_PropertyName(self, PropertyName):
+        self.PropertyName = PropertyName
+    PropertyNameProp = property(get_PropertyName, set_PropertyName)
+    def get_Box(self):
+        return self.Box
+    def set_Box(self, Box):
+        self.Box = Box
+    BoxProp = property(get_Box, set_Box)
+    def _hasContent(self):
+        if (
+            self.PropertyName is not None or
+            self.Box is not None or
+            super(BBOXType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" ', name_='BBOXType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('BBOXType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'BBOXType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BBOXType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='BBOXType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='BBOXType'):
+        super(BBOXType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BBOXType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" ', name_='BBOXType', fromsubclass_=False, pretty_print=True):
+        super(BBOXType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.PropertyName is not None:
+            namespaceprefix_ = self.PropertyName_nsprefix_ + ':' if (UseCapturedNS_ and self.PropertyName_nsprefix_) else ''
+            self.PropertyName.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='PropertyName', pretty_print=pretty_print)
+        if self.Box is not None:
+            namespaceprefix_ = self.Box_nsprefix_ + ':' if (UseCapturedNS_ and self.Box_nsprefix_) else ''
+            self.Box.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='Box', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(BBOXType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PropertyName = obj_
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Box':
+            obj_ = BoxType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Box = obj_
+            obj_.original_tagname_ = 'Box'
+        super(BBOXType, self)._buildChildren(child_, node, nodeName_, True)
+# end class BBOXType
+
+
+class DistanceBufferType(SpatialOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = SpatialOpsType
+    def __init__(self, PropertyName=None, _Geometry=None, Distance=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("DistanceBufferType"), self).__init__( **kwargs_)
+        self.PropertyName = PropertyName
+        self.PropertyName_nsprefix_ = "ogc"
+        self._Geometry = _Geometry
+        self._Geometry_nsprefix_ = "gml"
+        self.Distance = Distance
+        self.Distance_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, DistanceBufferType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if DistanceBufferType.subclass:
+            return DistanceBufferType.subclass(*args_, **kwargs_)
+        else:
+            return DistanceBufferType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PropertyName(self):
+        return self.PropertyName
+    def set_PropertyName(self, PropertyName):
+        self.PropertyName = PropertyName
+    PropertyNameProp = property(get_PropertyName, set_PropertyName)
+    def get__Geometry(self):
+        return self._Geometry
+    def set__Geometry(self, _Geometry):
+        self._Geometry = _Geometry
+    _GeometryProp = property(get__Geometry, set__Geometry)
+    def get_Distance(self):
+        return self.Distance
+    def set_Distance(self, Distance):
+        self.Distance = Distance
+    DistanceProp = property(get_Distance, set_Distance)
+    def _hasContent(self):
+        if (
+            self.PropertyName is not None or
+            self._Geometry is not None or
+            self.Distance is not None or
+            super(DistanceBufferType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" ', name_='DistanceBufferType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('DistanceBufferType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'DistanceBufferType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='DistanceBufferType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='DistanceBufferType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='DistanceBufferType'):
+        super(DistanceBufferType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='DistanceBufferType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" ', name_='DistanceBufferType', fromsubclass_=False, pretty_print=True):
+        super(DistanceBufferType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.PropertyName is not None:
+            namespaceprefix_ = self.PropertyName_nsprefix_ + ':' if (UseCapturedNS_ and self.PropertyName_nsprefix_) else ''
+            self.PropertyName.export(outfile, level, namespaceprefix_='ogc:', namespacedef_='', name_='PropertyName', pretty_print=pretty_print)
+        if self._Geometry is not None:
+            self._Geometry.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        if self.Distance is not None:
+            namespaceprefix_ = self.Distance_nsprefix_ + ':' if (UseCapturedNS_ and self.Distance_nsprefix_) else ''
+            self.Distance.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Distance', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(DistanceBufferType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PropertyName = obj_
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == '_Geometry':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <_Geometry> element')
+            self._Geometry = obj_
+            obj_.original_tagname_ = '_Geometry'
+        elif nodeName_ == '_GeometryCollection':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = '_GeometryCollection'
+        elif nodeName_ == 'Point':
+            obj_ = PointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'Point'
+        elif nodeName_ == 'LineString':
+            obj_ = LineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'LineString'
+        elif nodeName_ == 'LinearRing':
+            obj_ = LinearRingType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'LinearRing'
+        elif nodeName_ == 'Polygon':
+            obj_ = PolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'Polygon'
+        elif nodeName_ == 'MultiGeometry':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiGeometry'
+        elif nodeName_ == 'MultiPoint':
+            obj_ = MultiPointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiPoint'
+        elif nodeName_ == 'MultiLineString':
+            obj_ = MultiLineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiLineString'
+        elif nodeName_ == 'MultiPolygon':
+            obj_ = MultiPolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiPolygon'
+        elif nodeName_ == 'Distance':
+            obj_ = DistanceType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Distance = obj_
+            obj_.original_tagname_ = 'Distance'
+        super(DistanceBufferType, self)._buildChildren(child_, node, nodeName_, True)
+# end class DistanceBufferType
+
+
+class DistanceType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, units=None, valueOf_=None, mixedclass_=None, content_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        self.units = _cast(None, units)
+        self.units_nsprefix_ = None
+        self.valueOf_ = valueOf_
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+        self.valueOf_ = valueOf_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, DistanceType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if DistanceType.subclass:
+            return DistanceType.subclass(*args_, **kwargs_)
+        else:
+            return DistanceType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_units(self):
+        return self.units
+    def set_units(self, units):
+        self.units = units
+    unitsProp = property(get_units, set_units)
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def _hasContent(self):
+        if (
+            (1 if type(self.valueOf_) in [int,float] else self.valueOf_) or
+            self.content_
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='DistanceType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('DistanceType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'DistanceType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='DistanceType')
+        outfile.write('>')
+        self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_, pretty_print=pretty_print)
+        outfile.write(self.convert_unicode(self.valueOf_))
+        outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='DistanceType'):
+        if self.units is not None and 'units' not in already_processed:
+            already_processed.add('units')
+            outfile.write(' units=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.units), input_name='units')), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='DistanceType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
+        if node.text is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', node.text)
+            self.content_.append(obj_)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('units', node)
+        if value is not None and 'units' not in already_processed:
+            already_processed.add('units')
+            self.units = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if not fromsubclass_ and child_.tail is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.tail)
+            self.content_.append(obj_)
+        pass
+# end class DistanceType
+
+
+class BinaryLogicOpType(LogicOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = LogicOpsType
+    def __init__(self, comparisonOps=None, spatialOps=None, logicOps=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("BinaryLogicOpType"), self).__init__( **kwargs_)
+        if comparisonOps is None:
+            self.comparisonOps = []
+        else:
+            self.comparisonOps = comparisonOps
+        self.comparisonOps_nsprefix_ = "ogc"
+        if spatialOps is None:
+            self.spatialOps = []
+        else:
+            self.spatialOps = spatialOps
+        self.spatialOps_nsprefix_ = "ogc"
+        if logicOps is None:
+            self.logicOps = []
+        else:
+            self.logicOps = logicOps
+        self.logicOps_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, BinaryLogicOpType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if BinaryLogicOpType.subclass:
+            return BinaryLogicOpType.subclass(*args_, **kwargs_)
+        else:
+            return BinaryLogicOpType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_comparisonOps(self):
+        return self.comparisonOps
+    def set_comparisonOps(self, comparisonOps):
+        self.comparisonOps = comparisonOps
+    def add_comparisonOps(self, value):
+        self.comparisonOps.append(value)
+    def insert_comparisonOps_at(self, index, value):
+        self.comparisonOps.insert(index, value)
+    def replace_comparisonOps_at(self, index, value):
+        self.comparisonOps[index] = value
+    comparisonOpsProp = property(get_comparisonOps, set_comparisonOps)
+    def get_spatialOps(self):
+        return self.spatialOps
+    def set_spatialOps(self, spatialOps):
+        self.spatialOps = spatialOps
+    def add_spatialOps(self, value):
+        self.spatialOps.append(value)
+    def insert_spatialOps_at(self, index, value):
+        self.spatialOps.insert(index, value)
+    def replace_spatialOps_at(self, index, value):
+        self.spatialOps[index] = value
+    spatialOpsProp = property(get_spatialOps, set_spatialOps)
+    def get_logicOps(self):
+        return self.logicOps
+    def set_logicOps(self, logicOps):
+        self.logicOps = logicOps
+    def add_logicOps(self, value):
+        self.logicOps.append(value)
+    def insert_logicOps_at(self, index, value):
+        self.logicOps.insert(index, value)
+    def replace_logicOps_at(self, index, value):
+        self.logicOps[index] = value
+    logicOpsProp = property(get_logicOps, set_logicOps)
+    def _hasContent(self):
+        if (
+            self.comparisonOps or
+            self.spatialOps or
+            self.logicOps or
+            super(BinaryLogicOpType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='BinaryLogicOpType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('BinaryLogicOpType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'BinaryLogicOpType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BinaryLogicOpType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='BinaryLogicOpType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='BinaryLogicOpType'):
+        super(BinaryLogicOpType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BinaryLogicOpType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='BinaryLogicOpType', fromsubclass_=False, pretty_print=True):
+        super(BinaryLogicOpType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for comparisonOps_ in self.comparisonOps:
+            comparisonOps_.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        for spatialOps_ in self.spatialOps:
+            spatialOps_.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        for logicOps_ in self.logicOps:
+            logicOps_.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(BinaryLogicOpType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'comparisonOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <comparisonOps> element')
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'comparisonOps'
+        elif nodeName_ == 'PropertyIsEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsEqualTo'
+        elif nodeName_ == 'PropertyIsNotEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsNotEqualTo'
+        elif nodeName_ == 'PropertyIsLessThan':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsLessThan'
+        elif nodeName_ == 'PropertyIsGreaterThan':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsGreaterThan'
+        elif nodeName_ == 'PropertyIsLessThanOrEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsLessThanOrEqualTo'
+        elif nodeName_ == 'PropertyIsGreaterThanOrEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsGreaterThanOrEqualTo'
+        elif nodeName_ == 'PropertyIsLike':
+            obj_ = PropertyIsLikeType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsLike'
+        elif nodeName_ == 'PropertyIsNull':
+            obj_ = PropertyIsNullType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsNull'
+        elif nodeName_ == 'PropertyIsBetween':
+            obj_ = PropertyIsBetweenType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps.append(obj_)
+            obj_.original_tagname_ = 'PropertyIsBetween'
+        elif nodeName_ == 'spatialOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <spatialOps> element')
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'spatialOps'
+        elif nodeName_ == 'Equals':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Equals'
+        elif nodeName_ == 'Disjoint':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Disjoint'
+        elif nodeName_ == 'Touches':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Touches'
+        elif nodeName_ == 'Within':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Within'
+        elif nodeName_ == 'Overlaps':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Overlaps'
+        elif nodeName_ == 'Crosses':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Crosses'
+        elif nodeName_ == 'Intersects':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Intersects'
+        elif nodeName_ == 'Contains':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Contains'
+        elif nodeName_ == 'DWithin':
+            obj_ = DistanceBufferType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'DWithin'
+        elif nodeName_ == 'Beyond':
+            obj_ = DistanceBufferType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'Beyond'
+        elif nodeName_ == 'BBOX':
+            obj_ = BBOXType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps.append(obj_)
+            obj_.original_tagname_ = 'BBOX'
+        elif nodeName_ == 'logicOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <logicOps> element')
+            self.logicOps.append(obj_)
+            obj_.original_tagname_ = 'logicOps'
+        elif nodeName_ == 'And':
+            obj_ = BinaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps.append(obj_)
+            obj_.original_tagname_ = 'And'
+        elif nodeName_ == 'Or':
+            obj_ = BinaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps.append(obj_)
+            obj_.original_tagname_ = 'Or'
+        elif nodeName_ == 'Not':
+            obj_ = UnaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps.append(obj_)
+            obj_.original_tagname_ = 'Not'
+        super(BinaryLogicOpType, self)._buildChildren(child_, node, nodeName_, True)
+# end class BinaryLogicOpType
+
+
+class UnaryLogicOpType(LogicOpsType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = LogicOpsType
+    def __init__(self, comparisonOps=None, spatialOps=None, logicOps=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "ogc"
+        super(globals().get("UnaryLogicOpType"), self).__init__( **kwargs_)
+        self.comparisonOps = comparisonOps
+        self.comparisonOps_nsprefix_ = "ogc"
+        self.spatialOps = spatialOps
+        self.spatialOps_nsprefix_ = "ogc"
+        self.logicOps = logicOps
+        self.logicOps_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, UnaryLogicOpType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if UnaryLogicOpType.subclass:
+            return UnaryLogicOpType.subclass(*args_, **kwargs_)
+        else:
+            return UnaryLogicOpType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_comparisonOps(self):
+        return self.comparisonOps
+    def set_comparisonOps(self, comparisonOps):
+        self.comparisonOps = comparisonOps
+    comparisonOpsProp = property(get_comparisonOps, set_comparisonOps)
+    def get_spatialOps(self):
+        return self.spatialOps
+    def set_spatialOps(self, spatialOps):
+        self.spatialOps = spatialOps
+    spatialOpsProp = property(get_spatialOps, set_spatialOps)
+    def get_logicOps(self):
+        return self.logicOps
+    def set_logicOps(self, logicOps):
+        self.logicOps = logicOps
+    logicOpsProp = property(get_logicOps, set_logicOps)
+    def _hasContent(self):
+        if (
+            self.comparisonOps is not None or
+            self.spatialOps is not None or
+            self.logicOps is not None or
+            super(UnaryLogicOpType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='UnaryLogicOpType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('UnaryLogicOpType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'UnaryLogicOpType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='UnaryLogicOpType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='UnaryLogicOpType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='UnaryLogicOpType'):
+        super(UnaryLogicOpType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='UnaryLogicOpType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:ogc="http://www.opengis.net/ogc"', name_='UnaryLogicOpType', fromsubclass_=False, pretty_print=True):
+        super(UnaryLogicOpType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.comparisonOps is not None:
+            self.comparisonOps.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        if self.spatialOps is not None:
+            self.spatialOps.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+        if self.logicOps is not None:
+            self.logicOps.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(UnaryLogicOpType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'comparisonOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <comparisonOps> element')
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'comparisonOps'
+        elif nodeName_ == 'PropertyIsEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsEqualTo'
+        elif nodeName_ == 'PropertyIsNotEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsNotEqualTo'
+        elif nodeName_ == 'PropertyIsLessThan':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsLessThan'
+        elif nodeName_ == 'PropertyIsGreaterThan':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsGreaterThan'
+        elif nodeName_ == 'PropertyIsLessThanOrEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsLessThanOrEqualTo'
+        elif nodeName_ == 'PropertyIsGreaterThanOrEqualTo':
+            obj_ = BinaryComparisonOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsGreaterThanOrEqualTo'
+        elif nodeName_ == 'PropertyIsLike':
+            obj_ = PropertyIsLikeType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsLike'
+        elif nodeName_ == 'PropertyIsNull':
+            obj_ = PropertyIsNullType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsNull'
+        elif nodeName_ == 'PropertyIsBetween':
+            obj_ = PropertyIsBetweenType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.comparisonOps = obj_
+            obj_.original_tagname_ = 'PropertyIsBetween'
+        elif nodeName_ == 'spatialOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <spatialOps> element')
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'spatialOps'
+        elif nodeName_ == 'Equals':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Equals'
+        elif nodeName_ == 'Disjoint':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Disjoint'
+        elif nodeName_ == 'Touches':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Touches'
+        elif nodeName_ == 'Within':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Within'
+        elif nodeName_ == 'Overlaps':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Overlaps'
+        elif nodeName_ == 'Crosses':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Crosses'
+        elif nodeName_ == 'Intersects':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Intersects'
+        elif nodeName_ == 'Contains':
+            obj_ = BinarySpatialOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Contains'
+        elif nodeName_ == 'DWithin':
+            obj_ = DistanceBufferType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'DWithin'
+        elif nodeName_ == 'Beyond':
+            obj_ = DistanceBufferType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'Beyond'
+        elif nodeName_ == 'BBOX':
+            obj_ = BBOXType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.spatialOps = obj_
+            obj_.original_tagname_ = 'BBOX'
+        elif nodeName_ == 'logicOps':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <logicOps> element')
+            self.logicOps = obj_
+            obj_.original_tagname_ = 'logicOps'
+        elif nodeName_ == 'And':
+            obj_ = BinaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps = obj_
+            obj_.original_tagname_ = 'And'
+        elif nodeName_ == 'Or':
+            obj_ = BinaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps = obj_
+            obj_.original_tagname_ = 'Or'
+        elif nodeName_ == 'Not':
+            obj_ = UnaryLogicOpType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.logicOps = obj_
+            obj_.original_tagname_ = 'Not'
+        super(UnaryLogicOpType, self)._buildChildren(child_, node, nodeName_, True)
+# end class UnaryLogicOpType
+
+
+class ExpressionType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.extensiontype_ = extensiontype_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ExpressionType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if ExpressionType.subclass:
+            return ExpressionType.subclass(*args_, **kwargs_)
+        else:
+            return ExpressionType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"', name_='ExpressionType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ExpressionType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ExpressionType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ExpressionType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ExpressionType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='ExpressionType'):
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"', name_='ExpressionType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class ExpressionType
+
+
+class BinaryOperatorType(ExpressionType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ExpressionType
+    def __init__(self, expression=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("BinaryOperatorType"), self).__init__( **kwargs_)
+        if expression is None:
+            self.expression = []
+        else:
+            self.expression = expression
+        self.expression_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, BinaryOperatorType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if BinaryOperatorType.subclass:
+            return BinaryOperatorType.subclass(*args_, **kwargs_)
+        else:
+            return BinaryOperatorType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_expression(self):
+        return self.expression
+    def set_expression(self, expression):
+        self.expression = expression
+    def add_expression(self, value):
+        self.expression.append(value)
+    def insert_expression_at(self, index, value):
+        self.expression.insert(index, value)
+    def replace_expression_at(self, index, value):
+        self.expression[index] = value
+    expressionProp = property(get_expression, set_expression)
+    def _hasContent(self):
+        if (
+            self.expression or
+            super(BinaryOperatorType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='BinaryOperatorType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('BinaryOperatorType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'BinaryOperatorType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BinaryOperatorType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='BinaryOperatorType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='BinaryOperatorType'):
+        super(BinaryOperatorType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BinaryOperatorType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='BinaryOperatorType', fromsubclass_=False, pretty_print=True):
+        super(BinaryOperatorType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for expression_ in self.expression:
+            expression_.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(BinaryOperatorType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'expression':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <expression> element')
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'expression'
+        elif nodeName_ == 'Add':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Add'
+        elif nodeName_ == 'Sub':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Sub'
+        elif nodeName_ == 'Mul':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Mul'
+        elif nodeName_ == 'Div':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Div'
+        elif nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Function':
+            obj_ = FunctionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Function'
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Literal'
+        super(BinaryOperatorType, self)._buildChildren(child_, node, nodeName_, True)
+# end class BinaryOperatorType
+
+
+class FunctionType(ExpressionType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ExpressionType
+    def __init__(self, name=None, expression=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("FunctionType"), self).__init__( **kwargs_)
+        self.name = _cast(None, name)
+        self.name_nsprefix_ = None
+        if expression is None:
+            self.expression = []
+        else:
+            self.expression = expression
+        self.expression_nsprefix_ = "ogc"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, FunctionType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if FunctionType.subclass:
+            return FunctionType.subclass(*args_, **kwargs_)
+        else:
+            return FunctionType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_expression(self):
+        return self.expression
+    def set_expression(self, expression):
+        self.expression = expression
+    def add_expression(self, value):
+        self.expression.append(value)
+    def insert_expression_at(self, index, value):
+        self.expression.insert(index, value)
+    def replace_expression_at(self, index, value):
+        self.expression[index] = value
+    expressionProp = property(get_expression, set_expression)
+    def get_name(self):
+        return self.name
+    def set_name(self, name):
+        self.name = name
+    nameProp = property(get_name, set_name)
+    def _hasContent(self):
+        if (
+            self.expression or
+            super(FunctionType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='FunctionType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('FunctionType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'FunctionType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='FunctionType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='FunctionType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='FunctionType'):
+        super(FunctionType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='FunctionType')
+        if self.name is not None and 'name' not in already_processed:
+            already_processed.add('name')
+            outfile.write(' name=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.name), input_name='name')), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" ', name_='FunctionType', fromsubclass_=False, pretty_print=True):
+        super(FunctionType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for expression_ in self.expression:
+            expression_.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('name', node)
+        if value is not None and 'name' not in already_processed:
+            already_processed.add('name')
+            self.name = value
+        super(FunctionType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'expression':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <expression> element')
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'expression'
+        elif nodeName_ == 'Add':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Add'
+        elif nodeName_ == 'Sub':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Sub'
+        elif nodeName_ == 'Mul':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Mul'
+        elif nodeName_ == 'Div':
+            obj_ = BinaryOperatorType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Div'
+        elif nodeName_ == 'PropertyName':
+            obj_ = PropertyNameType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'PropertyName'
+        elif nodeName_ == 'Function':
+            obj_ = FunctionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Function'
+        elif nodeName_ == 'Literal':
+            obj_ = LiteralType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.expression.append(obj_)
+            obj_.original_tagname_ = 'Literal'
+        super(FunctionType, self)._buildChildren(child_, node, nodeName_, True)
+# end class FunctionType
+
+
+class LiteralType(ExpressionType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ExpressionType
+    def __init__(self, anytypeobjs_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        super(globals().get("LiteralType"), self).__init__( **kwargs_)
+        self.anytypeobjs_ = anytypeobjs_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LiteralType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LiteralType.subclass:
+            return LiteralType.subclass(*args_, **kwargs_)
+        else:
+            return LiteralType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_anytypeobjs_(self): return self.anytypeobjs_
+    def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
+    def _hasContent(self):
+        if (
+            self.anytypeobjs_ is not None or
+            super(LiteralType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:None="http://www.w3.org/2001/XMLSchema"  xmlns:ogc="http://www.opengis.net/ogc"', name_='LiteralType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LiteralType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LiteralType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LiteralType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LiteralType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='LiteralType'):
+        super(LiteralType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LiteralType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:None="http://www.w3.org/2001/XMLSchema"  xmlns:ogc="http://www.opengis.net/ogc"', name_='LiteralType', fromsubclass_=False, pretty_print=True):
+        super(LiteralType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if not fromsubclass_:
+            if self.anytypeobjs_ is not None:
+                content_ = self.anytypeobjs_
+                outfile.write(content_)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(LiteralType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        content_ = self.gds_build_any(child_, 'LiteralType')
+        self.set_anytypeobjs_(content_)
+        super(LiteralType, self)._buildChildren(child_, node, nodeName_, True)
+# end class LiteralType
+
+
+class PropertyNameType(ExpressionType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ExpressionType
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("PropertyNameType"), self).__init__( **kwargs_)
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PropertyNameType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PropertyNameType.subclass:
+            return PropertyNameType.subclass(*args_, **kwargs_)
+        else:
+            return PropertyNameType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def _hasContent(self):
+        if (
+            super(PropertyNameType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"', name_='PropertyNameType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PropertyNameType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PropertyNameType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PropertyNameType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PropertyNameType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='ogc:', name_='PropertyNameType'):
+        super(PropertyNameType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PropertyNameType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='ogc:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"', name_='PropertyNameType', fromsubclass_=False, pretty_print=True):
+        super(PropertyNameType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(PropertyNameType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        super(PropertyNameType, self)._buildChildren(child_, node, nodeName_, True)
+        pass
+# end class PropertyNameType
+
+
+class AbstractGeometryType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gid=None, srsName=None, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.gid = _cast(None, gid)
+        self.gid_nsprefix_ = None
+        self.srsName = _cast(None, srsName)
+        self.srsName_nsprefix_ = None
+        self.extensiontype_ = extensiontype_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, AbstractGeometryType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if AbstractGeometryType.subclass:
+            return AbstractGeometryType.subclass(*args_, **kwargs_)
+        else:
+            return AbstractGeometryType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_gid(self):
+        return self.gid
+    def set_gid(self, gid):
+        self.gid = gid
+    gidProp = property(get_gid, set_gid)
+    def get_srsName(self):
+        return self.srsName
+    def set_srsName(self, srsName):
+        self.srsName = srsName
+    srsNameProp = property(get_srsName, set_srsName)
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml"', name_='AbstractGeometryType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('AbstractGeometryType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'AbstractGeometryType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='AbstractGeometryType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='AbstractGeometryType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='AbstractGeometryType'):
+        if self.gid is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            outfile.write(' gid=%s' % (quote_attrib(self.gid), ))
+        if self.srsName is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            outfile.write(' srsName=%s' % (quote_attrib(self.srsName), ))
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml"', name_='AbstractGeometryType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('gid', node)
+        if value is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            self.gid = value
+        value = find_attr_value_('srsName', node)
+        if value is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            self.srsName = value
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class AbstractGeometryType
+
+
+class AbstractGeometryCollectionBaseType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gid=None, srsName=None, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.gid = _cast(None, gid)
+        self.gid_nsprefix_ = None
+        self.srsName = _cast(None, srsName)
+        self.srsName_nsprefix_ = None
+        self.extensiontype_ = extensiontype_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, AbstractGeometryCollectionBaseType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if AbstractGeometryCollectionBaseType.subclass:
+            return AbstractGeometryCollectionBaseType.subclass(*args_, **kwargs_)
+        else:
+            return AbstractGeometryCollectionBaseType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_gid(self):
+        return self.gid
+    def set_gid(self, gid):
+        self.gid = gid
+    gidProp = property(get_gid, set_gid)
+    def get_srsName(self):
+        return self.srsName
+    def set_srsName(self, srsName):
+        self.srsName = srsName
+    srsNameProp = property(get_srsName, set_srsName)
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml"', name_='AbstractGeometryCollectionBaseType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('AbstractGeometryCollectionBaseType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'AbstractGeometryCollectionBaseType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='AbstractGeometryCollectionBaseType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='AbstractGeometryCollectionBaseType', pretty_print=pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='AbstractGeometryCollectionBaseType'):
+        if self.gid is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            outfile.write(' gid=%s' % (quote_attrib(self.gid), ))
+        if self.srsName is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            outfile.write(' srsName=%s' % (quote_attrib(self.srsName), ))
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml"', name_='AbstractGeometryCollectionBaseType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('gid', node)
+        if value is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            self.gid = value
+        value = find_attr_value_('srsName', node)
+        if value is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            self.srsName = value
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class AbstractGeometryCollectionBaseType
+
+
+class GeometryAssociationType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, _Geometry=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self._Geometry = _Geometry
+        self._Geometry_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, GeometryAssociationType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if GeometryAssociationType.subclass:
+            return GeometryAssociationType.subclass(*args_, **kwargs_)
+        else:
+            return GeometryAssociationType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get__Geometry(self):
+        return self._Geometry
+    def set__Geometry(self, _Geometry):
+        self._Geometry = _Geometry
+    _GeometryProp = property(get__Geometry, set__Geometry)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self._Geometry is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='GeometryAssociationType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('GeometryAssociationType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'GeometryAssociationType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='GeometryAssociationType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='GeometryAssociationType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='GeometryAssociationType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='GeometryAssociationType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self._Geometry is not None:
+            self._Geometry.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == '_Geometry':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <_Geometry> element')
+            self._Geometry = obj_
+            obj_.original_tagname_ = '_Geometry'
+        elif nodeName_ == '_GeometryCollection':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = '_GeometryCollection'
+        elif nodeName_ == 'Point':
+            obj_ = PointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'Point'
+        elif nodeName_ == 'LineString':
+            obj_ = LineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'LineString'
+        elif nodeName_ == 'LinearRing':
+            obj_ = LinearRingType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'LinearRing'
+        elif nodeName_ == 'Polygon':
+            obj_ = PolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'Polygon'
+        elif nodeName_ == 'MultiGeometry':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiGeometry'
+        elif nodeName_ == 'MultiPoint':
+            obj_ = MultiPointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiPoint'
+        elif nodeName_ == 'MultiLineString':
+            obj_ = MultiLineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiLineString'
+        elif nodeName_ == 'MultiPolygon':
+            obj_ = MultiPolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiPolygon'
+# end class GeometryAssociationType
+
+
+class PointMemberType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, remoteSchema=None, Point=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.Point = Point
+        self.Point_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PointMemberType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PointMemberType.subclass:
+            return PointMemberType.subclass(*args_, **kwargs_)
+        else:
+            return PointMemberType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Point(self):
+        return self.Point
+    def set_Point(self, Point):
+        self.Point = Point
+    PointProp = property(get_Point, set_Point)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.Point is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PointMemberType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PointMemberType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PointMemberType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PointMemberType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PointMemberType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='PointMemberType'):
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PointMemberType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Point is not None:
+            namespaceprefix_ = self.Point_nsprefix_ + ':' if (UseCapturedNS_ and self.Point_nsprefix_) else ''
+            self.Point.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='Point', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Point':
+            obj_ = PointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Point = obj_
+            obj_.original_tagname_ = 'Point'
+# end class PointMemberType
+
+
+class LineStringMemberType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, remoteSchema=None, LineString=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.LineString = LineString
+        self.LineString_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LineStringMemberType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LineStringMemberType.subclass:
+            return LineStringMemberType.subclass(*args_, **kwargs_)
+        else:
+            return LineStringMemberType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_LineString(self):
+        return self.LineString
+    def set_LineString(self, LineString):
+        self.LineString = LineString
+    LineStringProp = property(get_LineString, set_LineString)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.LineString is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LineStringMemberType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LineStringMemberType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LineStringMemberType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LineStringMemberType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LineStringMemberType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='LineStringMemberType'):
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LineStringMemberType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.LineString is not None:
+            namespaceprefix_ = self.LineString_nsprefix_ + ':' if (UseCapturedNS_ and self.LineString_nsprefix_) else ''
+            self.LineString.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='LineString', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'LineString':
+            obj_ = LineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LineString = obj_
+            obj_.original_tagname_ = 'LineString'
+# end class LineStringMemberType
+
+
+class PolygonMemberType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, remoteSchema=None, Polygon=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.Polygon = Polygon
+        self.Polygon_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PolygonMemberType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PolygonMemberType.subclass:
+            return PolygonMemberType.subclass(*args_, **kwargs_)
+        else:
+            return PolygonMemberType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Polygon(self):
+        return self.Polygon
+    def set_Polygon(self, Polygon):
+        self.Polygon = Polygon
+    PolygonProp = property(get_Polygon, set_Polygon)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.Polygon is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PolygonMemberType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PolygonMemberType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PolygonMemberType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PolygonMemberType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PolygonMemberType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='PolygonMemberType'):
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PolygonMemberType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Polygon is not None:
+            namespaceprefix_ = self.Polygon_nsprefix_ + ':' if (UseCapturedNS_ and self.Polygon_nsprefix_) else ''
+            self.Polygon.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='Polygon', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Polygon':
+            obj_ = PolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Polygon = obj_
+            obj_.original_tagname_ = 'Polygon'
+# end class PolygonMemberType
+
+
+class LinearRingMemberType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, remoteSchema=None, LinearRing=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.LinearRing = LinearRing
+        self.LinearRing_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LinearRingMemberType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LinearRingMemberType.subclass:
+            return LinearRingMemberType.subclass(*args_, **kwargs_)
+        else:
+            return LinearRingMemberType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_LinearRing(self):
+        return self.LinearRing
+    def set_LinearRing(self, LinearRing):
+        self.LinearRing = LinearRing
+    LinearRingProp = property(get_LinearRing, set_LinearRing)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.LinearRing is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LinearRingMemberType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LinearRingMemberType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LinearRingMemberType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LinearRingMemberType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LinearRingMemberType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='LinearRingMemberType'):
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LinearRingMemberType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.LinearRing is not None:
+            namespaceprefix_ = self.LinearRing_nsprefix_ + ':' if (UseCapturedNS_ and self.LinearRing_nsprefix_) else ''
+            self.LinearRing.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='LinearRing', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'LinearRing':
+            obj_ = LinearRingType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LinearRing = obj_
+            obj_.original_tagname_ = 'LinearRing'
+# end class LinearRingMemberType
+
+
+class PointType(AbstractGeometryType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = AbstractGeometryType
+    def __init__(self, gid=None, srsName=None, coord=None, coordinates=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        super(globals().get("PointType"), self).__init__(gid, srsName,  **kwargs_)
+        self.coord = coord
+        self.coord_nsprefix_ = "gml"
+        self.coordinates = coordinates
+        self.coordinates_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PointType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PointType.subclass:
+            return PointType.subclass(*args_, **kwargs_)
+        else:
+            return PointType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_coord(self):
+        return self.coord
+    def set_coord(self, coord):
+        self.coord = coord
+    coordProp = property(get_coord, set_coord)
+    def get_coordinates(self):
+        return self.coordinates
+    def set_coordinates(self, coordinates):
+        self.coordinates = coordinates
+    coordinatesProp = property(get_coordinates, set_coordinates)
+    def _hasContent(self):
+        if (
+            self.coord is not None or
+            self.coordinates is not None or
+            super(PointType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PointType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PointType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PointType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PointType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PointType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='PointType'):
+        super(PointType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PointType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PointType', fromsubclass_=False, pretty_print=True):
+        super(PointType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.coord is not None:
+            namespaceprefix_ = self.coord_nsprefix_ + ':' if (UseCapturedNS_ and self.coord_nsprefix_) else ''
+            self.coord.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='coord', pretty_print=pretty_print)
+        if self.coordinates is not None:
+            namespaceprefix_ = self.coordinates_nsprefix_ + ':' if (UseCapturedNS_ and self.coordinates_nsprefix_) else ''
+            self.coordinates.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='coordinates', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(PointType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'coord':
+            obj_ = CoordType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coord = obj_
+            obj_.original_tagname_ = 'coord'
+        elif nodeName_ == 'coordinates':
+            obj_ = CoordinatesType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coordinates = obj_
+            obj_.original_tagname_ = 'coordinates'
+        super(PointType, self)._buildChildren(child_, node, nodeName_, True)
+# end class PointType
+
+
+class LineStringType(AbstractGeometryType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = AbstractGeometryType
+    def __init__(self, gid=None, srsName=None, coord=None, coordinates=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        super(globals().get("LineStringType"), self).__init__(gid, srsName,  **kwargs_)
+        if coord is None:
+            self.coord = []
+        else:
+            self.coord = coord
+        self.coord_nsprefix_ = "gml"
+        self.coordinates = coordinates
+        self.coordinates_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LineStringType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LineStringType.subclass:
+            return LineStringType.subclass(*args_, **kwargs_)
+        else:
+            return LineStringType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_coord(self):
+        return self.coord
+    def set_coord(self, coord):
+        self.coord = coord
+    def add_coord(self, value):
+        self.coord.append(value)
+    def insert_coord_at(self, index, value):
+        self.coord.insert(index, value)
+    def replace_coord_at(self, index, value):
+        self.coord[index] = value
+    coordProp = property(get_coord, set_coord)
+    def get_coordinates(self):
+        return self.coordinates
+    def set_coordinates(self, coordinates):
+        self.coordinates = coordinates
+    coordinatesProp = property(get_coordinates, set_coordinates)
+    def _hasContent(self):
+        if (
+            self.coord or
+            self.coordinates is not None or
+            super(LineStringType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LineStringType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LineStringType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LineStringType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LineStringType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LineStringType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='LineStringType'):
+        super(LineStringType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LineStringType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LineStringType', fromsubclass_=False, pretty_print=True):
+        super(LineStringType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for coord_ in self.coord:
+            namespaceprefix_ = self.coord_nsprefix_ + ':' if (UseCapturedNS_ and self.coord_nsprefix_) else ''
+            coord_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='coord', pretty_print=pretty_print)
+        if self.coordinates is not None:
+            namespaceprefix_ = self.coordinates_nsprefix_ + ':' if (UseCapturedNS_ and self.coordinates_nsprefix_) else ''
+            self.coordinates.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='coordinates', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(LineStringType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'coord':
+            obj_ = CoordType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coord.append(obj_)
+            obj_.original_tagname_ = 'coord'
+        elif nodeName_ == 'coordinates':
+            obj_ = CoordinatesType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coordinates = obj_
+            obj_.original_tagname_ = 'coordinates'
+        super(LineStringType, self)._buildChildren(child_, node, nodeName_, True)
+# end class LineStringType
+
+
+class LinearRingType(AbstractGeometryType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = AbstractGeometryType
+    def __init__(self, gid=None, srsName=None, coord=None, coordinates=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        super(globals().get("LinearRingType"), self).__init__(gid, srsName,  **kwargs_)
+        if coord is None:
+            self.coord = []
+        else:
+            self.coord = coord
+        self.coord_nsprefix_ = "gml"
+        self.coordinates = coordinates
+        self.coordinates_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LinearRingType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LinearRingType.subclass:
+            return LinearRingType.subclass(*args_, **kwargs_)
+        else:
+            return LinearRingType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_coord(self):
+        return self.coord
+    def set_coord(self, coord):
+        self.coord = coord
+    def add_coord(self, value):
+        self.coord.append(value)
+    def insert_coord_at(self, index, value):
+        self.coord.insert(index, value)
+    def replace_coord_at(self, index, value):
+        self.coord[index] = value
+    coordProp = property(get_coord, set_coord)
+    def get_coordinates(self):
+        return self.coordinates
+    def set_coordinates(self, coordinates):
+        self.coordinates = coordinates
+    coordinatesProp = property(get_coordinates, set_coordinates)
+    def _hasContent(self):
+        if (
+            self.coord or
+            self.coordinates is not None or
+            super(LinearRingType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LinearRingType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LinearRingType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LinearRingType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LinearRingType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LinearRingType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='LinearRingType'):
+        super(LinearRingType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LinearRingType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LinearRingType', fromsubclass_=False, pretty_print=True):
+        super(LinearRingType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for coord_ in self.coord:
+            namespaceprefix_ = self.coord_nsprefix_ + ':' if (UseCapturedNS_ and self.coord_nsprefix_) else ''
+            coord_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='coord', pretty_print=pretty_print)
+        if self.coordinates is not None:
+            namespaceprefix_ = self.coordinates_nsprefix_ + ':' if (UseCapturedNS_ and self.coordinates_nsprefix_) else ''
+            self.coordinates.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='coordinates', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(LinearRingType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'coord':
+            obj_ = CoordType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coord.append(obj_)
+            obj_.original_tagname_ = 'coord'
+        elif nodeName_ == 'coordinates':
+            obj_ = CoordinatesType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coordinates = obj_
+            obj_.original_tagname_ = 'coordinates'
+        super(LinearRingType, self)._buildChildren(child_, node, nodeName_, True)
+# end class LinearRingType
+
+
+class BoxType(AbstractGeometryType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = AbstractGeometryType
+    def __init__(self, gid=None, srsName=None, coord=None, coordinates=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        super(globals().get("BoxType"), self).__init__(gid, srsName,  **kwargs_)
+        if coord is None:
+            self.coord = []
+        else:
+            self.coord = coord
+        self.coord_nsprefix_ = "gml"
+        self.coordinates = coordinates
+        self.coordinates_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, BoxType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if BoxType.subclass:
+            return BoxType.subclass(*args_, **kwargs_)
+        else:
+            return BoxType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_coord(self):
+        return self.coord
+    def set_coord(self, coord):
+        self.coord = coord
+    def add_coord(self, value):
+        self.coord.append(value)
+    def insert_coord_at(self, index, value):
+        self.coord.insert(index, value)
+    def replace_coord_at(self, index, value):
+        self.coord[index] = value
+    coordProp = property(get_coord, set_coord)
+    def get_coordinates(self):
+        return self.coordinates
+    def set_coordinates(self, coordinates):
+        self.coordinates = coordinates
+    coordinatesProp = property(get_coordinates, set_coordinates)
+    def _hasContent(self):
+        if (
+            self.coord or
+            self.coordinates is not None or
+            super(BoxType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='BoxType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('BoxType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'BoxType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BoxType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='BoxType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='BoxType'):
+        super(BoxType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BoxType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='BoxType', fromsubclass_=False, pretty_print=True):
+        super(BoxType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for coord_ in self.coord:
+            namespaceprefix_ = self.coord_nsprefix_ + ':' if (UseCapturedNS_ and self.coord_nsprefix_) else ''
+            coord_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='coord', pretty_print=pretty_print)
+        if self.coordinates is not None:
+            namespaceprefix_ = self.coordinates_nsprefix_ + ':' if (UseCapturedNS_ and self.coordinates_nsprefix_) else ''
+            self.coordinates.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='coordinates', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(BoxType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'coord':
+            obj_ = CoordType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coord.append(obj_)
+            obj_.original_tagname_ = 'coord'
+        elif nodeName_ == 'coordinates':
+            obj_ = CoordinatesType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.coordinates = obj_
+            obj_.original_tagname_ = 'coordinates'
+        super(BoxType, self)._buildChildren(child_, node, nodeName_, True)
+# end class BoxType
+
+
+class PolygonType(AbstractGeometryType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = AbstractGeometryType
+    def __init__(self, gid=None, srsName=None, outerBoundaryIs=None, innerBoundaryIs=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        super(globals().get("PolygonType"), self).__init__(gid, srsName,  **kwargs_)
+        self.outerBoundaryIs = outerBoundaryIs
+        self.outerBoundaryIs_nsprefix_ = "gml"
+        if innerBoundaryIs is None:
+            self.innerBoundaryIs = []
+        else:
+            self.innerBoundaryIs = innerBoundaryIs
+        self.innerBoundaryIs_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PolygonType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PolygonType.subclass:
+            return PolygonType.subclass(*args_, **kwargs_)
+        else:
+            return PolygonType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_outerBoundaryIs(self):
+        return self.outerBoundaryIs
+    def set_outerBoundaryIs(self, outerBoundaryIs):
+        self.outerBoundaryIs = outerBoundaryIs
+    outerBoundaryIsProp = property(get_outerBoundaryIs, set_outerBoundaryIs)
+    def get_innerBoundaryIs(self):
+        return self.innerBoundaryIs
+    def set_innerBoundaryIs(self, innerBoundaryIs):
+        self.innerBoundaryIs = innerBoundaryIs
+    def add_innerBoundaryIs(self, value):
+        self.innerBoundaryIs.append(value)
+    def insert_innerBoundaryIs_at(self, index, value):
+        self.innerBoundaryIs.insert(index, value)
+    def replace_innerBoundaryIs_at(self, index, value):
+        self.innerBoundaryIs[index] = value
+    innerBoundaryIsProp = property(get_innerBoundaryIs, set_innerBoundaryIs)
+    def _hasContent(self):
+        if (
+            self.outerBoundaryIs is not None or
+            self.innerBoundaryIs or
+            super(PolygonType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PolygonType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PolygonType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PolygonType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PolygonType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PolygonType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='PolygonType'):
+        super(PolygonType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PolygonType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PolygonType', fromsubclass_=False, pretty_print=True):
+        super(PolygonType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.outerBoundaryIs is not None:
+            namespaceprefix_ = self.outerBoundaryIs_nsprefix_ + ':' if (UseCapturedNS_ and self.outerBoundaryIs_nsprefix_) else ''
+            self.outerBoundaryIs.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='outerBoundaryIs', pretty_print=pretty_print)
+        for innerBoundaryIs_ in self.innerBoundaryIs:
+            namespaceprefix_ = self.innerBoundaryIs_nsprefix_ + ':' if (UseCapturedNS_ and self.innerBoundaryIs_nsprefix_) else ''
+            innerBoundaryIs_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='innerBoundaryIs', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(PolygonType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'outerBoundaryIs':
+            obj_ = LinearRingMemberType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.outerBoundaryIs = obj_
+            obj_.original_tagname_ = 'outerBoundaryIs'
+        elif nodeName_ == 'innerBoundaryIs':
+            obj_ = LinearRingMemberType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.innerBoundaryIs.append(obj_)
+            obj_.original_tagname_ = 'innerBoundaryIs'
+        super(PolygonType, self)._buildChildren(child_, node, nodeName_, True)
+# end class PolygonType
+
+
+class GeometryCollectionType(AbstractGeometryCollectionBaseType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = AbstractGeometryCollectionBaseType
+    def __init__(self, gid=None, srsName=None, geometryMember=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        super(globals().get("GeometryCollectionType"), self).__init__(gid, srsName,  **kwargs_)
+        if geometryMember is None:
+            self.geometryMember = []
+        else:
+            self.geometryMember = geometryMember
+        self.geometryMember_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, GeometryCollectionType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if GeometryCollectionType.subclass:
+            return GeometryCollectionType.subclass(*args_, **kwargs_)
+        else:
+            return GeometryCollectionType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_geometryMember(self):
+        return self.geometryMember
+    def set_geometryMember(self, geometryMember):
+        self.geometryMember = geometryMember
+    def add_geometryMember(self, value):
+        self.geometryMember.append(value)
+    def insert_geometryMember_at(self, index, value):
+        self.geometryMember.insert(index, value)
+    def replace_geometryMember_at(self, index, value):
+        self.geometryMember[index] = value
+    geometryMemberProp = property(get_geometryMember, set_geometryMember)
+    def _hasContent(self):
+        if (
+            self.geometryMember or
+            super(GeometryCollectionType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='GeometryCollectionType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('GeometryCollectionType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'GeometryCollectionType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='GeometryCollectionType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='GeometryCollectionType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='GeometryCollectionType'):
+        super(GeometryCollectionType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='GeometryCollectionType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='GeometryCollectionType', fromsubclass_=False, pretty_print=True):
+        super(GeometryCollectionType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for geometryMember_ in self.geometryMember:
+            namespaceprefix_ = self.geometryMember_nsprefix_ + ':' if (UseCapturedNS_ and self.geometryMember_nsprefix_) else ''
+            geometryMember_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='geometryMember', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(GeometryCollectionType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'geometryMember':
+            obj_ = GeometryAssociationType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.geometryMember.append(obj_)
+            obj_.original_tagname_ = 'geometryMember'
+        elif nodeName_ == 'pointMember':
+            obj_ = PointMemberType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.geometryMember.append(obj_)
+            obj_.original_tagname_ = 'pointMember'
+        elif nodeName_ == 'lineStringMember':
+            obj_ = LineStringMemberType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.geometryMember.append(obj_)
+            obj_.original_tagname_ = 'lineStringMember'
+        elif nodeName_ == 'polygonMember':
+            obj_ = PolygonMemberType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.geometryMember.append(obj_)
+            obj_.original_tagname_ = 'polygonMember'
+        super(GeometryCollectionType, self)._buildChildren(child_, node, nodeName_, True)
+# end class GeometryCollectionType
+
+
+class MultiPointType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gid=None, srsName=None, pointMember=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        self.gid = _cast(None, gid)
+        self.gid_nsprefix_ = None
+        self.srsName = _cast(None, srsName)
+        self.srsName_nsprefix_ = None
+        if pointMember is None:
+            self.pointMember = []
+        else:
+            self.pointMember = pointMember
+        self.pointMember_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, MultiPointType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if MultiPointType.subclass:
+            return MultiPointType.subclass(*args_, **kwargs_)
+        else:
+            return MultiPointType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_pointMember(self):
+        return self.pointMember
+    def set_pointMember(self, pointMember):
+        self.pointMember = pointMember
+    def add_pointMember(self, value):
+        self.pointMember.append(value)
+    def insert_pointMember_at(self, index, value):
+        self.pointMember.insert(index, value)
+    def replace_pointMember_at(self, index, value):
+        self.pointMember[index] = value
+    pointMemberProp = property(get_pointMember, set_pointMember)
+    def get_gid(self):
+        return self.gid
+    def set_gid(self, gid):
+        self.gid = gid
+    gidProp = property(get_gid, set_gid)
+    def get_srsName(self):
+        return self.srsName
+    def set_srsName(self, srsName):
+        self.srsName = srsName
+    srsNameProp = property(get_srsName, set_srsName)
+    def _hasContent(self):
+        if (
+            self.pointMember
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiPointType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('MultiPointType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'MultiPointType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='MultiPointType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='MultiPointType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='MultiPointType'):
+        if self.gid is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            outfile.write(' gid=%s' % (quote_attrib(self.gid), ))
+        if self.srsName is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            outfile.write(' srsName=%s' % (quote_attrib(self.srsName), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiPointType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for pointMember_ in self.pointMember:
+            namespaceprefix_ = self.pointMember_nsprefix_ + ':' if (UseCapturedNS_ and self.pointMember_nsprefix_) else ''
+            pointMember_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='pointMember', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('gid', node)
+        if value is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            self.gid = value
+        value = find_attr_value_('srsName', node)
+        if value is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            self.srsName = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'pointMember':
+            obj_ = PointMemberType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.pointMember.append(obj_)
+            obj_.original_tagname_ = 'pointMember'
+# end class MultiPointType
+
+
+class MultiLineStringType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gid=None, srsName=None, lineStringMember=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        self.gid = _cast(None, gid)
+        self.gid_nsprefix_ = None
+        self.srsName = _cast(None, srsName)
+        self.srsName_nsprefix_ = None
+        if lineStringMember is None:
+            self.lineStringMember = []
+        else:
+            self.lineStringMember = lineStringMember
+        self.lineStringMember_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, MultiLineStringType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if MultiLineStringType.subclass:
+            return MultiLineStringType.subclass(*args_, **kwargs_)
+        else:
+            return MultiLineStringType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_lineStringMember(self):
+        return self.lineStringMember
+    def set_lineStringMember(self, lineStringMember):
+        self.lineStringMember = lineStringMember
+    def add_lineStringMember(self, value):
+        self.lineStringMember.append(value)
+    def insert_lineStringMember_at(self, index, value):
+        self.lineStringMember.insert(index, value)
+    def replace_lineStringMember_at(self, index, value):
+        self.lineStringMember[index] = value
+    lineStringMemberProp = property(get_lineStringMember, set_lineStringMember)
+    def get_gid(self):
+        return self.gid
+    def set_gid(self, gid):
+        self.gid = gid
+    gidProp = property(get_gid, set_gid)
+    def get_srsName(self):
+        return self.srsName
+    def set_srsName(self, srsName):
+        self.srsName = srsName
+    srsNameProp = property(get_srsName, set_srsName)
+    def _hasContent(self):
+        if (
+            self.lineStringMember
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiLineStringType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('MultiLineStringType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'MultiLineStringType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='MultiLineStringType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='MultiLineStringType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='MultiLineStringType'):
+        if self.gid is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            outfile.write(' gid=%s' % (quote_attrib(self.gid), ))
+        if self.srsName is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            outfile.write(' srsName=%s' % (quote_attrib(self.srsName), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiLineStringType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for lineStringMember_ in self.lineStringMember:
+            namespaceprefix_ = self.lineStringMember_nsprefix_ + ':' if (UseCapturedNS_ and self.lineStringMember_nsprefix_) else ''
+            lineStringMember_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='lineStringMember', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('gid', node)
+        if value is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            self.gid = value
+        value = find_attr_value_('srsName', node)
+        if value is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            self.srsName = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'lineStringMember':
+            obj_ = LineStringMemberType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.lineStringMember.append(obj_)
+            obj_.original_tagname_ = 'lineStringMember'
+# end class MultiLineStringType
+
+
+class MultiPolygonType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, gid=None, srsName=None, polygonMember=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "gml"
+        self.gid = _cast(None, gid)
+        self.gid_nsprefix_ = None
+        self.srsName = _cast(None, srsName)
+        self.srsName_nsprefix_ = None
+        if polygonMember is None:
+            self.polygonMember = []
+        else:
+            self.polygonMember = polygonMember
+        self.polygonMember_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, MultiPolygonType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if MultiPolygonType.subclass:
+            return MultiPolygonType.subclass(*args_, **kwargs_)
+        else:
+            return MultiPolygonType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_polygonMember(self):
+        return self.polygonMember
+    def set_polygonMember(self, polygonMember):
+        self.polygonMember = polygonMember
+    def add_polygonMember(self, value):
+        self.polygonMember.append(value)
+    def insert_polygonMember_at(self, index, value):
+        self.polygonMember.insert(index, value)
+    def replace_polygonMember_at(self, index, value):
+        self.polygonMember[index] = value
+    polygonMemberProp = property(get_polygonMember, set_polygonMember)
+    def get_gid(self):
+        return self.gid
+    def set_gid(self, gid):
+        self.gid = gid
+    gidProp = property(get_gid, set_gid)
+    def get_srsName(self):
+        return self.srsName
+    def set_srsName(self, srsName):
+        self.srsName = srsName
+    srsNameProp = property(get_srsName, set_srsName)
+    def _hasContent(self):
+        if (
+            self.polygonMember
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiPolygonType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('MultiPolygonType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'MultiPolygonType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='MultiPolygonType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='MultiPolygonType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='MultiPolygonType'):
+        if self.gid is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            outfile.write(' gid=%s' % (quote_attrib(self.gid), ))
+        if self.srsName is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            outfile.write(' srsName=%s' % (quote_attrib(self.srsName), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiPolygonType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for polygonMember_ in self.polygonMember:
+            namespaceprefix_ = self.polygonMember_nsprefix_ + ':' if (UseCapturedNS_ and self.polygonMember_nsprefix_) else ''
+            polygonMember_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='polygonMember', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('gid', node)
+        if value is not None and 'gid' not in already_processed:
+            already_processed.add('gid')
+            self.gid = value
+        value = find_attr_value_('srsName', node)
+        if value is not None and 'srsName' not in already_processed:
+            already_processed.add('srsName')
+            self.srsName = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'polygonMember':
+            obj_ = PolygonMemberType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.polygonMember.append(obj_)
+            obj_.original_tagname_ = 'polygonMember'
+# end class MultiPolygonType
+
+
+class CoordType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, X=None, Y=None, Z=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.X = X
+        self.X_nsprefix_ = None
+        self.Y = Y
+        self.Y_nsprefix_ = None
+        self.Z = Z
+        self.Z_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, CoordType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if CoordType.subclass:
+            return CoordType.subclass(*args_, **kwargs_)
+        else:
+            return CoordType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_X(self):
+        return self.X
+    def set_X(self, X):
+        self.X = X
+    XProp = property(get_X, set_X)
+    def get_Y(self):
+        return self.Y
+    def set_Y(self, Y):
+        self.Y = Y
+    YProp = property(get_Y, set_Y)
+    def get_Z(self):
+        return self.Z
+    def set_Z(self, Z):
+        self.Z = Z
+    ZProp = property(get_Z, set_Z)
+    def _hasContent(self):
+        if (
+            self.X is not None or
+            self.Y is not None or
+            self.Z is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:None="http://www.w3.org/2001/XMLSchema"  xmlns:gml="http://www.opengis.net/gml"', name_='CoordType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('CoordType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'CoordType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='CoordType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='CoordType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='CoordType'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:None="http://www.w3.org/2001/XMLSchema"  xmlns:gml="http://www.opengis.net/gml"', name_='CoordType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.X is not None:
+            namespaceprefix_ = self.X_nsprefix_ + ':' if (UseCapturedNS_ and self.X_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sX>%s</%sX>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.X), input_name='X')), namespaceprefix_ , eol_))
+        if self.Y is not None:
+            namespaceprefix_ = self.Y_nsprefix_ + ':' if (UseCapturedNS_ and self.Y_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sY>%s</%sY>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Y), input_name='Y')), namespaceprefix_ , eol_))
+        if self.Z is not None:
+            namespaceprefix_ = self.Z_nsprefix_ + ':' if (UseCapturedNS_ and self.Z_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sZ>%s</%sZ>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Z), input_name='Z')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'X':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'X')
+            value_ = self.gds_validate_string(value_, node, 'X')
+            self.X = value_
+            self.X_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Y':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Y')
+            value_ = self.gds_validate_string(value_, node, 'Y')
+            self.Y = value_
+            self.Y_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Z':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Z')
+            value_ = self.gds_validate_string(value_, node, 'Z')
+            self.Z = value_
+            self.Z_nsprefix_ = child_.prefix
+# end class CoordType
+
+
+class CoordinatesType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, decimal='.', cs=',', ts=' ', valueOf_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.decimal = _cast(None, decimal)
+        self.decimal_nsprefix_ = None
+        self.cs = _cast(None, cs)
+        self.cs_nsprefix_ = None
+        self.ts = _cast(None, ts)
+        self.ts_nsprefix_ = None
+        self.valueOf_ = valueOf_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, CoordinatesType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if CoordinatesType.subclass:
+            return CoordinatesType.subclass(*args_, **kwargs_)
+        else:
+            return CoordinatesType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_decimal(self):
+        return self.decimal
+    def set_decimal(self, decimal):
+        self.decimal = decimal
+    decimalProp = property(get_decimal, set_decimal)
+    def get_cs(self):
+        return self.cs
+    def set_cs(self, cs):
+        self.cs = cs
+    csProp = property(get_cs, set_cs)
+    def get_ts(self):
+        return self.ts
+    def set_ts(self, ts):
+        self.ts = ts
+    tsProp = property(get_ts, set_ts)
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def _hasContent(self):
+        if (
+            (1 if type(self.valueOf_) in [int,float] else self.valueOf_)
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml"', name_='CoordinatesType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('CoordinatesType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'CoordinatesType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='CoordinatesType')
+        outfile.write('>')
+        self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_, pretty_print=pretty_print)
+        outfile.write(self.convert_unicode(self.valueOf_))
+        outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='CoordinatesType'):
+        if self.decimal != "." and 'decimal' not in already_processed:
+            already_processed.add('decimal')
+            outfile.write(' decimal=%s' % (quote_attrib(self.decimal), ))
+        if self.cs != "," and 'cs' not in already_processed:
+            already_processed.add('cs')
+            outfile.write(' cs=%s' % (quote_attrib(self.cs), ))
+        if self.ts != " " and 'ts' not in already_processed:
+            already_processed.add('ts')
+            outfile.write(' ts=%s' % (quote_attrib(self.ts), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml"', name_='CoordinatesType', fromsubclass_=False, pretty_print=True):
+        pass
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('decimal', node)
+        if value is not None and 'decimal' not in already_processed:
+            already_processed.add('decimal')
+            self.decimal = value
+        value = find_attr_value_('cs', node)
+        if value is not None and 'cs' not in already_processed:
+            already_processed.add('cs')
+            self.cs = value
+        value = find_attr_value_('ts', node)
+        if value is not None and 'ts' not in already_processed:
+            already_processed.add('ts')
+            self.ts = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class CoordinatesType
+
+
+class AbstractFeatureType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, fid=None, description=None, name=None, boundedBy=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.fid = _cast(None, fid)
+        self.fid_nsprefix_ = None
+        self.description = description
+        self.description_nsprefix_ = "gml"
+        self.name = name
+        self.name_nsprefix_ = "gml"
+        self.boundedBy = boundedBy
+        self.boundedBy_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, AbstractFeatureType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if AbstractFeatureType.subclass:
+            return AbstractFeatureType.subclass(*args_, **kwargs_)
+        else:
+            return AbstractFeatureType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_description(self):
+        return self.description
+    def set_description(self, description):
+        self.description = description
+    descriptionProp = property(get_description, set_description)
+    def get_name(self):
+        return self.name
+    def set_name(self, name):
+        self.name = name
+    nameProp = property(get_name, set_name)
+    def get_boundedBy(self):
+        return self.boundedBy
+    def set_boundedBy(self, boundedBy):
+        self.boundedBy = boundedBy
+    boundedByProp = property(get_boundedBy, set_boundedBy)
+    def get_fid(self):
+        return self.fid
+    def set_fid(self, fid):
+        self.fid = fid
+    fidProp = property(get_fid, set_fid)
+    def _hasContent(self):
+        if (
+            self.description is not None or
+            self.name is not None or
+            self.boundedBy is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='AbstractFeatureType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('AbstractFeatureType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'AbstractFeatureType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='AbstractFeatureType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='AbstractFeatureType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='AbstractFeatureType'):
+        if self.fid is not None and 'fid' not in already_processed:
+            already_processed.add('fid')
+            outfile.write(' fid=%s' % (quote_attrib(self.fid), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='AbstractFeatureType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.description is not None:
+            namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdescription>%s</%sdescription>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.description), input_name='description')), namespaceprefix_ , eol_))
+        if self.name is not None:
+            namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sname>%s</%sname>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.name), input_name='name')), namespaceprefix_ , eol_))
+        if self.boundedBy is not None:
+            namespaceprefix_ = self.boundedBy_nsprefix_ + ':' if (UseCapturedNS_ and self.boundedBy_nsprefix_) else ''
+            self.boundedBy.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='boundedBy', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('fid', node)
+        if value is not None and 'fid' not in already_processed:
+            already_processed.add('fid')
+            self.fid = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'description':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'description')
+            value_ = self.gds_validate_string(value_, node, 'description')
+            self.description = value_
+            self.description_nsprefix_ = child_.prefix
+        elif nodeName_ == 'name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'name')
+            value_ = self.gds_validate_string(value_, node, 'name')
+            self.name = value_
+            self.name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'boundedBy':
+            obj_ = BoundingShapeType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.boundedBy = obj_
+            obj_.original_tagname_ = 'boundedBy'
+# end class AbstractFeatureType
+
+
+class AbstractFeatureCollectionBaseType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, fid=None, description=None, name=None, boundedBy=None, extensiontype_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.fid = _cast(None, fid)
+        self.fid_nsprefix_ = None
+        self.description = description
+        self.description_nsprefix_ = "gml"
+        self.name = name
+        self.name_nsprefix_ = "gml"
+        self.boundedBy = boundedBy
+        self.boundedBy_nsprefix_ = "gml"
+        self.extensiontype_ = extensiontype_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, AbstractFeatureCollectionBaseType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if AbstractFeatureCollectionBaseType.subclass:
+            return AbstractFeatureCollectionBaseType.subclass(*args_, **kwargs_)
+        else:
+            return AbstractFeatureCollectionBaseType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_description(self):
+        return self.description
+    def set_description(self, description):
+        self.description = description
+    descriptionProp = property(get_description, set_description)
+    def get_name(self):
+        return self.name
+    def set_name(self, name):
+        self.name = name
+    nameProp = property(get_name, set_name)
+    def get_boundedBy(self):
+        return self.boundedBy
+    def set_boundedBy(self, boundedBy):
+        self.boundedBy = boundedBy
+    boundedByProp = property(get_boundedBy, set_boundedBy)
+    def get_fid(self):
+        return self.fid
+    def set_fid(self, fid):
+        self.fid = fid
+    fidProp = property(get_fid, set_fid)
+    def get_extensiontype_(self): return self.extensiontype_
+    def set_extensiontype_(self, extensiontype_): self.extensiontype_ = extensiontype_
+    def _hasContent(self):
+        if (
+            self.description is not None or
+            self.name is not None or
+            self.boundedBy is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='AbstractFeatureCollectionBaseType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('AbstractFeatureCollectionBaseType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'AbstractFeatureCollectionBaseType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='AbstractFeatureCollectionBaseType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='AbstractFeatureCollectionBaseType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='AbstractFeatureCollectionBaseType'):
+        if self.fid is not None and 'fid' not in already_processed:
+            already_processed.add('fid')
+            outfile.write(' fid=%s' % (quote_attrib(self.fid), ))
+        if self.extensiontype_ is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            outfile.write(' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            if ":" not in self.extensiontype_:
+                imported_ns_type_prefix_ = GenerateDSNamespaceTypePrefixes_.get(self.extensiontype_, '')
+                outfile.write(' xsi:type="%s%s"' % (imported_ns_type_prefix_, self.extensiontype_))
+            else:
+                outfile.write(' xsi:type="%s"' % self.extensiontype_)
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='AbstractFeatureCollectionBaseType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.description is not None:
+            namespaceprefix_ = self.description_nsprefix_ + ':' if (UseCapturedNS_ and self.description_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sdescription>%s</%sdescription>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.description), input_name='description')), namespaceprefix_ , eol_))
+        if self.name is not None:
+            namespaceprefix_ = self.name_nsprefix_ + ':' if (UseCapturedNS_ and self.name_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sname>%s</%sname>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.name), input_name='name')), namespaceprefix_ , eol_))
+        if self.boundedBy is not None:
+            namespaceprefix_ = self.boundedBy_nsprefix_ + ':' if (UseCapturedNS_ and self.boundedBy_nsprefix_) else ''
+            self.boundedBy.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='boundedBy', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('fid', node)
+        if value is not None and 'fid' not in already_processed:
+            already_processed.add('fid')
+            self.fid = value
+        value = find_attr_value_('xsi:type', node)
+        if value is not None and 'xsi:type' not in already_processed:
+            already_processed.add('xsi:type')
+            self.extensiontype_ = value
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'description':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'description')
+            value_ = self.gds_validate_string(value_, node, 'description')
+            self.description = value_
+            self.description_nsprefix_ = child_.prefix
+        elif nodeName_ == 'name':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'name')
+            value_ = self.gds_validate_string(value_, node, 'name')
+            self.name = value_
+            self.name_nsprefix_ = child_.prefix
+        elif nodeName_ == 'boundedBy':
+            obj_ = BoundingShapeType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.boundedBy = obj_
+            obj_.original_tagname_ = 'boundedBy'
+# end class AbstractFeatureCollectionBaseType
+
+
+class AbstractFeatureCollectionType(AbstractFeatureCollectionBaseType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = AbstractFeatureCollectionBaseType
+    def __init__(self, fid=None, description=None, name=None, boundedBy=None, featureMember=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("AbstractFeatureCollectionType"), self).__init__(fid, description, name, boundedBy,  **kwargs_)
+        if featureMember is None:
+            self.featureMember = []
+        else:
+            self.featureMember = featureMember
+        self.featureMember_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, AbstractFeatureCollectionType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if AbstractFeatureCollectionType.subclass:
+            return AbstractFeatureCollectionType.subclass(*args_, **kwargs_)
+        else:
+            return AbstractFeatureCollectionType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_featureMember(self):
+        return self.featureMember
+    def set_featureMember(self, featureMember):
+        self.featureMember = featureMember
+    def add_featureMember(self, value):
+        self.featureMember.append(value)
+    def insert_featureMember_at(self, index, value):
+        self.featureMember.insert(index, value)
+    def replace_featureMember_at(self, index, value):
+        self.featureMember[index] = value
+    featureMemberProp = property(get_featureMember, set_featureMember)
+    def _hasContent(self):
+        if (
+            self.featureMember or
+            super(AbstractFeatureCollectionType, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='AbstractFeatureCollectionType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('AbstractFeatureCollectionType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'AbstractFeatureCollectionType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='AbstractFeatureCollectionType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='AbstractFeatureCollectionType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='AbstractFeatureCollectionType'):
+        super(AbstractFeatureCollectionType, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='AbstractFeatureCollectionType')
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='AbstractFeatureCollectionType', fromsubclass_=False, pretty_print=True):
+        super(AbstractFeatureCollectionType, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for featureMember_ in self.featureMember:
+            namespaceprefix_ = self.featureMember_nsprefix_ + ':' if (UseCapturedNS_ and self.featureMember_nsprefix_) else ''
+            featureMember_.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='featureMember', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        super(AbstractFeatureCollectionType, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'featureMember':
+            obj_ = FeatureAssociationType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.featureMember.append(obj_)
+            obj_.original_tagname_ = 'featureMember'
+        super(AbstractFeatureCollectionType, self)._buildChildren(child_, node, nodeName_, True)
+# end class AbstractFeatureCollectionType
+
+
+class GeometryPropertyType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, _Geometry=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self._Geometry = _Geometry
+        self._Geometry_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, GeometryPropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if GeometryPropertyType.subclass:
+            return GeometryPropertyType.subclass(*args_, **kwargs_)
+        else:
+            return GeometryPropertyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get__Geometry(self):
+        return self._Geometry
+    def set__Geometry(self, _Geometry):
+        self._Geometry = _Geometry
+    _GeometryProp = property(get__Geometry, set__Geometry)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self._Geometry is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='GeometryPropertyType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('GeometryPropertyType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'GeometryPropertyType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='GeometryPropertyType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='GeometryPropertyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='GeometryPropertyType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='GeometryPropertyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self._Geometry is not None:
+            self._Geometry.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == '_Geometry':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <_Geometry> element')
+            self._Geometry = obj_
+            obj_.original_tagname_ = '_Geometry'
+        elif nodeName_ == '_GeometryCollection':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = '_GeometryCollection'
+        elif nodeName_ == 'Point':
+            obj_ = PointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'Point'
+        elif nodeName_ == 'LineString':
+            obj_ = LineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'LineString'
+        elif nodeName_ == 'LinearRing':
+            obj_ = LinearRingType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'LinearRing'
+        elif nodeName_ == 'Polygon':
+            obj_ = PolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'Polygon'
+        elif nodeName_ == 'MultiGeometry':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiGeometry'
+        elif nodeName_ == 'MultiPoint':
+            obj_ = MultiPointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiPoint'
+        elif nodeName_ == 'MultiLineString':
+            obj_ = MultiLineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiLineString'
+        elif nodeName_ == 'MultiPolygon':
+            obj_ = MultiPolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self._Geometry = obj_
+            obj_.original_tagname_ = 'MultiPolygon'
+# end class GeometryPropertyType
+
+
+class FeatureAssociationType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, _Feature=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self._Feature = _Feature
+        self._Feature_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, FeatureAssociationType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if FeatureAssociationType.subclass:
+            return FeatureAssociationType.subclass(*args_, **kwargs_)
+        else:
+            return FeatureAssociationType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get__Feature(self):
+        return self._Feature
+    def set__Feature(self, _Feature):
+        self._Feature = _Feature
+    _FeatureProp = property(get__Feature, set__Feature)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self._Feature is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='FeatureAssociationType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('FeatureAssociationType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'FeatureAssociationType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='FeatureAssociationType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='FeatureAssociationType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='FeatureAssociationType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='FeatureAssociationType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self._Feature is not None:
+            self._Feature.export(outfile, level, namespaceprefix_, namespacedef_='', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == '_Feature':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <_Feature> element')
+            self._Feature = obj_
+            obj_.original_tagname_ = '_Feature'
+        elif nodeName_ == '_FeatureCollection':
+            type_name_ = child_.attrib.get(
+                '{http://www.w3.org/2001/XMLSchema-instance}type')
+            if type_name_ is None:
+                type_name_ = child_.attrib.get('type')
+            if type_name_ is not None:
+                type_names_ = type_name_.split(':')
+                if len(type_names_) == 1:
+                    type_name_ = type_names_[0]
+                else:
+                    type_name_ = type_names_[1]
+                class_ = globals()["" + type_name_]
+                obj_ = class_.factory()
+                obj_.build(child_, gds_collector_=gds_collector_)
+            else:
+                raise NotImplementedError(
+                    'Class not implemented for <_FeatureCollection> element')
+            self._Feature = obj_
+            obj_.original_tagname_ = '_FeatureCollection'
+# end class FeatureAssociationType
+
+
+class BoundingShapeType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Box=None, null=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.Box = Box
+        self.Box_nsprefix_ = "gml"
+        self.null = null
+        self.validate_NullType(self.null)
+        self.null_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, BoundingShapeType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if BoundingShapeType.subclass:
+            return BoundingShapeType.subclass(*args_, **kwargs_)
+        else:
+            return BoundingShapeType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Box(self):
+        return self.Box
+    def set_Box(self, Box):
+        self.Box = Box
+    BoxProp = property(get_Box, set_Box)
+    def get_null(self):
+        return self.null
+    def set_null(self, null):
+        self.null = null
+    nullProp = property(get_null, set_null)
+    def validate_NullType(self, value):
+        result = True
+        # Validate type NullType, a restriction on string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['inapplicable', 'unknown', 'unavailable', 'missing']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on NullType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def _hasContent(self):
+        if (
+            self.Box is not None or
+            self.null is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='BoundingShapeType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('BoundingShapeType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'BoundingShapeType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='BoundingShapeType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='BoundingShapeType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='BoundingShapeType'):
+        pass
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='BoundingShapeType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Box is not None:
+            namespaceprefix_ = self.Box_nsprefix_ + ':' if (UseCapturedNS_ and self.Box_nsprefix_) else ''
+            self.Box.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='Box', pretty_print=pretty_print)
+        if self.null is not None:
+            namespaceprefix_ = self.null_nsprefix_ + ':' if (UseCapturedNS_ and self.null_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%snull>%s</%snull>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.null), input_name='null')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        pass
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Box':
+            obj_ = BoxType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Box = obj_
+            obj_.original_tagname_ = 'Box'
+        elif nodeName_ == 'null':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'null')
+            value_ = self.gds_validate_string(value_, node, 'null')
+            self.null = value_
+            self.null_nsprefix_ = child_.prefix
+            # validate type NullType
+            self.validate_NullType(self.null)
+# end class BoundingShapeType
+
+
+class PointPropertyType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, Point=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.Point = Point
+        self.Point_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PointPropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PointPropertyType.subclass:
+            return PointPropertyType.subclass(*args_, **kwargs_)
+        else:
+            return PointPropertyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Point(self):
+        return self.Point
+    def set_Point(self, Point):
+        self.Point = Point
+    PointProp = property(get_Point, set_Point)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.Point is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PointPropertyType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PointPropertyType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PointPropertyType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PointPropertyType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PointPropertyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='PointPropertyType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PointPropertyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Point is not None:
+            namespaceprefix_ = self.Point_nsprefix_ + ':' if (UseCapturedNS_ and self.Point_nsprefix_) else ''
+            self.Point.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='Point', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Point':
+            obj_ = PointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Point = obj_
+            obj_.original_tagname_ = 'Point'
+# end class PointPropertyType
+
+
+class PolygonPropertyType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, Polygon=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.Polygon = Polygon
+        self.Polygon_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PolygonPropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PolygonPropertyType.subclass:
+            return PolygonPropertyType.subclass(*args_, **kwargs_)
+        else:
+            return PolygonPropertyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Polygon(self):
+        return self.Polygon
+    def set_Polygon(self, Polygon):
+        self.Polygon = Polygon
+    PolygonProp = property(get_Polygon, set_Polygon)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.Polygon is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PolygonPropertyType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PolygonPropertyType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PolygonPropertyType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PolygonPropertyType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PolygonPropertyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='PolygonPropertyType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='PolygonPropertyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Polygon is not None:
+            namespaceprefix_ = self.Polygon_nsprefix_ + ':' if (UseCapturedNS_ and self.Polygon_nsprefix_) else ''
+            self.Polygon.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='Polygon', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Polygon':
+            obj_ = PolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Polygon = obj_
+            obj_.original_tagname_ = 'Polygon'
+# end class PolygonPropertyType
+
+
+class LineStringPropertyType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, LineString=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.LineString = LineString
+        self.LineString_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, LineStringPropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if LineStringPropertyType.subclass:
+            return LineStringPropertyType.subclass(*args_, **kwargs_)
+        else:
+            return LineStringPropertyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_LineString(self):
+        return self.LineString
+    def set_LineString(self, LineString):
+        self.LineString = LineString
+    LineStringProp = property(get_LineString, set_LineString)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.LineString is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LineStringPropertyType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('LineStringPropertyType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'LineStringPropertyType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='LineStringPropertyType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='LineStringPropertyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='LineStringPropertyType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='LineStringPropertyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.LineString is not None:
+            namespaceprefix_ = self.LineString_nsprefix_ + ':' if (UseCapturedNS_ and self.LineString_nsprefix_) else ''
+            self.LineString.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='LineString', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'LineString':
+            obj_ = LineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LineString = obj_
+            obj_.original_tagname_ = 'LineString'
+# end class LineStringPropertyType
+
+
+class MultiPointPropertyType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, MultiPoint=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.MultiPoint = MultiPoint
+        self.MultiPoint_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, MultiPointPropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if MultiPointPropertyType.subclass:
+            return MultiPointPropertyType.subclass(*args_, **kwargs_)
+        else:
+            return MultiPointPropertyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_MultiPoint(self):
+        return self.MultiPoint
+    def set_MultiPoint(self, MultiPoint):
+        self.MultiPoint = MultiPoint
+    MultiPointProp = property(get_MultiPoint, set_MultiPoint)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.MultiPoint is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiPointPropertyType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('MultiPointPropertyType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'MultiPointPropertyType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='MultiPointPropertyType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='MultiPointPropertyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='MultiPointPropertyType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiPointPropertyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.MultiPoint is not None:
+            namespaceprefix_ = self.MultiPoint_nsprefix_ + ':' if (UseCapturedNS_ and self.MultiPoint_nsprefix_) else ''
+            self.MultiPoint.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='MultiPoint', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'MultiPoint':
+            obj_ = MultiPointType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.MultiPoint = obj_
+            obj_.original_tagname_ = 'MultiPoint'
+# end class MultiPointPropertyType
+
+
+class MultiLineStringPropertyType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, MultiLineString=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.MultiLineString = MultiLineString
+        self.MultiLineString_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, MultiLineStringPropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if MultiLineStringPropertyType.subclass:
+            return MultiLineStringPropertyType.subclass(*args_, **kwargs_)
+        else:
+            return MultiLineStringPropertyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_MultiLineString(self):
+        return self.MultiLineString
+    def set_MultiLineString(self, MultiLineString):
+        self.MultiLineString = MultiLineString
+    MultiLineStringProp = property(get_MultiLineString, set_MultiLineString)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.MultiLineString is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiLineStringPropertyType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('MultiLineStringPropertyType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'MultiLineStringPropertyType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='MultiLineStringPropertyType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='MultiLineStringPropertyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='MultiLineStringPropertyType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiLineStringPropertyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.MultiLineString is not None:
+            namespaceprefix_ = self.MultiLineString_nsprefix_ + ':' if (UseCapturedNS_ and self.MultiLineString_nsprefix_) else ''
+            self.MultiLineString.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='MultiLineString', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'MultiLineString':
+            obj_ = MultiLineStringType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.MultiLineString = obj_
+            obj_.original_tagname_ = 'MultiLineString'
+# end class MultiLineStringPropertyType
+
+
+class MultiPolygonPropertyType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, MultiPolygon=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.MultiPolygon = MultiPolygon
+        self.MultiPolygon_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, MultiPolygonPropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if MultiPolygonPropertyType.subclass:
+            return MultiPolygonPropertyType.subclass(*args_, **kwargs_)
+        else:
+            return MultiPolygonPropertyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_MultiPolygon(self):
+        return self.MultiPolygon
+    def set_MultiPolygon(self, MultiPolygon):
+        self.MultiPolygon = MultiPolygon
+    MultiPolygonProp = property(get_MultiPolygon, set_MultiPolygon)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.MultiPolygon is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiPolygonPropertyType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('MultiPolygonPropertyType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'MultiPolygonPropertyType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='MultiPolygonPropertyType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='MultiPolygonPropertyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='MultiPolygonPropertyType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiPolygonPropertyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.MultiPolygon is not None:
+            namespaceprefix_ = self.MultiPolygon_nsprefix_ + ':' if (UseCapturedNS_ and self.MultiPolygon_nsprefix_) else ''
+            self.MultiPolygon.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='MultiPolygon', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'MultiPolygon':
+            obj_ = MultiPolygonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.MultiPolygon = obj_
+            obj_.original_tagname_ = 'MultiPolygon'
+# end class MultiPolygonPropertyType
+
+
+class MultiGeometryPropertyType(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, remoteSchema=None, type_='simple', href=None, role=None, arcrole=None, title=None, show=None, actuate=None, MultiGeometry=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        self.remoteSchema = _cast(None, remoteSchema)
+        self.remoteSchema_nsprefix_ = None
+        self.type_ = _cast(None, type_)
+        self.type__nsprefix_ = None
+        self.href = _cast(None, href)
+        self.href_nsprefix_ = None
+        self.role = _cast(None, role)
+        self.role_nsprefix_ = None
+        self.arcrole = _cast(None, arcrole)
+        self.arcrole_nsprefix_ = None
+        self.title = _cast(None, title)
+        self.title_nsprefix_ = None
+        self.show = _cast(None, show)
+        self.show_nsprefix_ = None
+        self.actuate = _cast(None, actuate)
+        self.actuate_nsprefix_ = None
+        self.MultiGeometry = MultiGeometry
+        self.MultiGeometry_nsprefix_ = "gml"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, MultiGeometryPropertyType)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if MultiGeometryPropertyType.subclass:
+            return MultiGeometryPropertyType.subclass(*args_, **kwargs_)
+        else:
+            return MultiGeometryPropertyType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_MultiGeometry(self):
+        return self.MultiGeometry
+    def set_MultiGeometry(self, MultiGeometry):
+        self.MultiGeometry = MultiGeometry
+    MultiGeometryProp = property(get_MultiGeometry, set_MultiGeometry)
+    def get_remoteSchema(self):
+        return self.remoteSchema
+    def set_remoteSchema(self, remoteSchema):
+        self.remoteSchema = remoteSchema
+    remoteSchemaProp = property(get_remoteSchema, set_remoteSchema)
+    def get_type(self):
+        return self.type_
+    def set_type(self, type_):
+        self.type_ = type_
+    typeProp = property(get_type, set_type)
+    def get_href(self):
+        return self.href
+    def set_href(self, href):
+        self.href = href
+    hrefProp = property(get_href, set_href)
+    def get_role(self):
+        return self.role
+    def set_role(self, role):
+        self.role = role
+    roleProp = property(get_role, set_role)
+    def get_arcrole(self):
+        return self.arcrole
+    def set_arcrole(self, arcrole):
+        self.arcrole = arcrole
+    arcroleProp = property(get_arcrole, set_arcrole)
+    def get_title(self):
+        return self.title
+    def set_title(self, title):
+        self.title = title
+    titleProp = property(get_title, set_title)
+    def get_show(self):
+        return self.show
+    def set_show(self, show):
+        self.show = show
+    showProp = property(get_show, set_show)
+    def get_actuate(self):
+        return self.actuate
+    def set_actuate(self, actuate):
+        self.actuate = actuate
+    actuateProp = property(get_actuate, set_actuate)
+    def validate_typeType(self, value):
+        # Validate type xlink:typeType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['simple', 'extended', 'title', 'resource', 'locator', 'arc']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on typeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_hrefType(self, value):
+        # Validate type xlink:hrefType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_roleType(self, value):
+        # Validate type xlink:roleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on roleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_arcroleType(self, value):
+        # Validate type xlink:arcroleType, a restriction on xs:anyURI.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on arcroleType' % {"value" : value, "lineno": lineno} )
+                result = False
+    def validate_titleAttrType(self, value):
+        # Validate type xlink:titleAttrType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            pass
+    def validate_showType(self, value):
+        # Validate type xlink:showType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['new', 'replace', 'embed', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on showType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def validate_actuateType(self, value):
+        # Validate type xlink:actuateType, a restriction on xs:token.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            value = value
+            enumerations = ['onLoad', 'onRequest', 'other', 'none']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on actuateType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+    def _hasContent(self):
+        if (
+            self.MultiGeometry is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiGeometryPropertyType', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('MultiGeometryPropertyType')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'MultiGeometryPropertyType':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='MultiGeometryPropertyType')
+        if self._hasContent():
+            outfile.write('>%s' % (eol_, ))
+            self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='MultiGeometryPropertyType', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='gml:', name_='MultiGeometryPropertyType'):
+        if self.remoteSchema is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            outfile.write(' remoteSchema=%s' % (quote_attrib(self.remoteSchema), ))
+        if self.type_ != "simple" and 'type_' not in already_processed:
+            already_processed.add('type_')
+            outfile.write(' xlink:type=%s' % (quote_attrib(self.type_), ))
+        if self.href is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            outfile.write(' xlink:href=%s' % (quote_attrib(self.href), ))
+        if self.role is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            outfile.write(' xlink:role=%s' % (quote_attrib(self.role), ))
+        if self.arcrole is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            outfile.write(' xlink:arcrole=%s' % (quote_attrib(self.arcrole), ))
+        if self.title is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            outfile.write(' xlink:title=%s' % (quote_attrib(self.title), ))
+        if self.show is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            outfile.write(' xlink:show=%s' % (quote_attrib(self.show), ))
+        if self.actuate is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            outfile.write(' xlink:actuate=%s' % (quote_attrib(self.actuate), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='gml:', namespacedef_='xmlns:sld="http://www.opengis.net/sld" xmlns:gml="http://www.opengis.net/gml" ', name_='MultiGeometryPropertyType', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.MultiGeometry is not None:
+            namespaceprefix_ = self.MultiGeometry_nsprefix_ + ':' if (UseCapturedNS_ and self.MultiGeometry_nsprefix_) else ''
+            self.MultiGeometry.export(outfile, level, namespaceprefix_='gml:', namespacedef_='', name_='MultiGeometry', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('remoteSchema', node)
+        if value is not None and 'remoteSchema' not in already_processed:
+            already_processed.add('remoteSchema')
+            self.remoteSchema = value
+        value = find_attr_value_('type', node)
+        if value is not None and 'type' not in already_processed:
+            already_processed.add('type')
+            self.type_ = value
+            self.validate_typeType(self.type_)    # validate type typeType
+        value = find_attr_value_('href', node)
+        if value is not None and 'href' not in already_processed:
+            already_processed.add('href')
+            self.href = value
+            self.validate_hrefType(self.href)    # validate type hrefType
+        value = find_attr_value_('role', node)
+        if value is not None and 'role' not in already_processed:
+            already_processed.add('role')
+            self.role = value
+            self.validate_roleType(self.role)    # validate type roleType
+        value = find_attr_value_('arcrole', node)
+        if value is not None and 'arcrole' not in already_processed:
+            already_processed.add('arcrole')
+            self.arcrole = value
+            self.validate_arcroleType(self.arcrole)    # validate type arcroleType
+        value = find_attr_value_('title', node)
+        if value is not None and 'title' not in already_processed:
+            already_processed.add('title')
+            self.title = value
+            self.validate_titleAttrType(self.title)    # validate type titleAttrType
+        value = find_attr_value_('show', node)
+        if value is not None and 'show' not in already_processed:
+            already_processed.add('show')
+            self.show = value
+            self.validate_showType(self.show)    # validate type showType
+        value = find_attr_value_('actuate', node)
+        if value is not None and 'actuate' not in already_processed:
+            already_processed.add('actuate')
+            self.actuate = value
+            self.validate_actuateType(self.actuate)    # validate type actuateType
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'MultiGeometry':
+            obj_ = GeometryCollectionType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.MultiGeometry = obj_
+            obj_.original_tagname_ = 'MultiGeometry'
+# end class MultiGeometryPropertyType
+
+
+class CssParameter(ParameterValueType):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = ParameterValueType
+    def __init__(self, expression=None, name=None, valueOf_=None, mixedclass_=None, content_=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = "sld"
+        super(globals().get("CssParameter"), self).__init__(expression, valueOf_, mixedclass_, content_,  **kwargs_)
+        self.name = _cast(None, name)
+        self.name_nsprefix_ = None
+        self.valueOf_ = valueOf_
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+        self.valueOf_ = valueOf_
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, CssParameter)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if CssParameter.subclass:
+            return CssParameter.subclass(*args_, **kwargs_)
+        else:
+            return CssParameter(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_name(self):
+        return self.name
+    def set_name(self, name):
+        self.name = name
+    nameProp = property(get_name, set_name)
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def _hasContent(self):
+        if (
+            (1 if type(self.valueOf_) in [int,float] else self.valueOf_) or
+            self.content_ or
+            super(CssParameter, self)._hasContent()
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='CssParameter', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('CssParameter')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'CssParameter':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='CssParameter')
+        outfile.write('>')
+        self._exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_, pretty_print=pretty_print)
+        outfile.write(self.convert_unicode(self.valueOf_))
+        outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+    def _exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='CssParameter'):
+        super(CssParameter, self)._exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='CssParameter')
+        if self.name is not None and 'name' not in already_processed:
+            already_processed.add('name')
+            outfile.write(' name=%s' % (self.gds_encode(self.gds_format_string(quote_attrib(self.name), input_name='name')), ))
+    def _exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='xmlns:sld="http://www.opengis.net/sld"', name_='CssParameter', fromsubclass_=False, pretty_print=True):
+        super(CssParameter, self)._exportChildren(outfile, level, namespaceprefix_, namespacedef_, name_, True, pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self._buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
+        if node.text is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', node.text)
+            self.content_.append(obj_)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self._buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def _buildAttributes(self, node, attrs, already_processed):
+        value = find_attr_value_('name', node)
+        if value is not None and 'name' not in already_processed:
+            already_processed.add('name')
+            self.name = value
+        super(CssParameter, self)._buildAttributes(node, attrs, already_processed)
+    def _buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if not fromsubclass_ and child_.tail is not None:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.tail)
+            self.content_.append(obj_)
+        super(CssParameter, self)._buildChildren(child_, node, nodeName_, True)
+        pass
+# end class CssParameter
+
+
+GDSClassesMapping = {
+    'Add': BinaryOperatorType,
+    'AnchorPointX': ParameterValueType,
+    'AnchorPointY': ParameterValueType,
+    'And': BinaryLogicOpType,
+    'BBOX': BBOXType,
+    'Beyond': DistanceBufferType,
+    'BlueChannel': SelectedChannelType,
+    'Box': BoxType,
+    'Contains': BinarySpatialOpType,
+    'Crosses': BinarySpatialOpType,
+    'DWithin': DistanceBufferType,
+    'Disjoint': BinarySpatialOpType,
+    'DisplacementX': ParameterValueType,
+    'DisplacementY': ParameterValueType,
+    'Div': BinaryOperatorType,
+    'Equals': BinarySpatialOpType,
+    'FeatureId': FeatureIdType,
+    'Filter': FilterType,
+    'Function': FunctionType,
+    'GrayChannel': SelectedChannelType,
+    'GreenChannel': SelectedChannelType,
+    'Intersects': BinarySpatialOpType,
+    'Label': ParameterValueType,
+    'LineString': LineStringType,
+    'LinearRing': LinearRingType,
+    'Literal': LiteralType,
+    'Mul': BinaryOperatorType,
+    'MultiGeometry': GeometryCollectionType,
+    'MultiLineString': MultiLineStringType,
+    'MultiPoint': MultiPointType,
+    'MultiPolygon': MultiPolygonType,
+    'Not': UnaryLogicOpType,
+    'Opacity': ParameterValueType,
+    'Or': BinaryLogicOpType,
+    'Overlaps': BinarySpatialOpType,
+    'PerpendicularOffset': ParameterValueType,
+    'Point': PointType,
+    'Polygon': PolygonType,
+    'PropertyIsBetween': PropertyIsBetweenType,
+    'PropertyIsEqualTo': BinaryComparisonOpType,
+    'PropertyIsGreaterThan': BinaryComparisonOpType,
+    'PropertyIsGreaterThanOrEqualTo': BinaryComparisonOpType,
+    'PropertyIsLessThan': BinaryComparisonOpType,
+    'PropertyIsLessThanOrEqualTo': BinaryComparisonOpType,
+    'PropertyIsLike': PropertyIsLikeType,
+    'PropertyIsNotEqualTo': BinaryComparisonOpType,
+    'PropertyIsNull': PropertyIsNullType,
+    'PropertyName': PropertyNameType,
+    'Radius': ParameterValueType,
+    'RedChannel': SelectedChannelType,
+    'Rotation': ParameterValueType,
+    'Size': ParameterValueType,
+    'Sub': BinaryOperatorType,
+    'Symbolizer': SymbolizerType,
+    'Touches': BinarySpatialOpType,
+    'Within': BinarySpatialOpType,
+    '_Feature': AbstractFeatureType,
+    '_FeatureCollection': AbstractFeatureCollectionType,
+    '_Geometry': AbstractGeometryType,
+    '_GeometryCollection': GeometryCollectionType,
+    '_geometryProperty': GeometryAssociationType,
+    'arc': arcType,
+    'boundedBy': BoundingShapeType,
+    'centerLineOf': LineStringPropertyType,
+    'centerOf': PointPropertyType,
+    'comparisonOps': ComparisonOpsType,
+    'coord': CoordType,
+    'coordinates': CoordinatesType,
+    'coverage': PolygonPropertyType,
+    'edgeOf': LineStringPropertyType,
+    'expression': ExpressionType,
+    'extentOf': PolygonPropertyType,
+    'featureMember': FeatureAssociationType,
+    'geometryMember': GeometryAssociationType,
+    'geometryProperty': GeometryAssociationType,
+    'innerBoundaryIs': LinearRingMemberType,
+    'lineStringMember': LineStringMemberType,
+    'lineStringProperty': LineStringPropertyType,
+    'location': PointPropertyType,
+    'locator': locatorType,
+    'logicOps': LogicOpsType,
+    'multiCenterLineOf': MultiLineStringPropertyType,
+    'multiCenterOf': MultiPointPropertyType,
+    'multiCoverage': MultiPolygonPropertyType,
+    'multiEdgeOf': MultiLineStringPropertyType,
+    'multiExtentOf': MultiPolygonPropertyType,
+    'multiGeometryProperty': MultiGeometryPropertyType,
+    'multiLineStringProperty': MultiLineStringPropertyType,
+    'multiLocation': MultiPointPropertyType,
+    'multiPointProperty': MultiPointPropertyType,
+    'multiPolygonProperty': MultiPolygonPropertyType,
+    'multiPosition': MultiPointPropertyType,
+    'outerBoundaryIs': LinearRingMemberType,
+    'pointMember': PointMemberType,
+    'pointProperty': PointPropertyType,
+    'polygonMember': PolygonMemberType,
+    'polygonProperty': PolygonPropertyType,
+    'position': PointPropertyType,
+    'resource': resourceType,
+    'spatialOps': SpatialOpsType,
+    'title': titleEltType,
+}
+
+
+USAGE_TEXT = """
+Usage: python <Parser>.py [ -s ] <in_xml_file>
+"""
+
+
+def usage():
+    print(USAGE_TEXT)
+    sys.exit(1)
+
+
+def get_root_tag(node):
+    tag = Tag_pattern_.match(node.tag).groups()[-1]
+    prefix_tag = TagNamePrefix + tag
+    rootClass = GDSClassesMapping.get(prefix_tag)
+    if rootClass is None:
+        rootClass = globals().get(prefix_tag)
+    return tag, rootClass
+
+
+def get_required_ns_prefix_defs(rootNode):
+    '''Get all name space prefix definitions required in this XML doc.
+    Return a dictionary of definitions and a char string of definitions.
+    '''
+    nsmap = {
+        prefix: uri
+        for node in rootNode.iter()
+        for (prefix, uri) in node.nsmap.items()
+        if prefix is not None
+    }
+    namespacedefs = ' '.join([
+        'xmlns:{}="{}"'.format(prefix, uri)
+        for prefix, uri in nsmap.items()
+    ])
+    return nsmap, namespacedefs
+
+
+def parse(inFileName, silence=False, print_warnings=True):
+    global CapturedNsmap_
+    gds_collector = GdsCollector_()
+    parser = None
+    doc = parsexml_(inFileName, parser)
+    rootNode = doc.getroot()
+    rootTag, rootClass = get_root_tag(rootNode)
+    if rootClass is None:
+        rootTag = 'StyledLayerDescriptor'
+        rootClass = StyledLayerDescriptor
+    rootObj = rootClass.factory()
+    rootObj.build(rootNode, gds_collector_=gds_collector)
+    CapturedNsmap_, namespacedefs = get_required_ns_prefix_defs(rootNode)
+    if not SaveElementTreeNode:
+        doc = None
+        rootNode = None
+    if not silence:
+        sys.stdout.write('<?xml version="1.0" ?>\n')
+        rootObj.export(
+            sys.stdout, 0, name_=rootTag,
+            namespacedef_=namespacedefs,
+            pretty_print=True)
+    if print_warnings and len(gds_collector.get_messages()) > 0:
+        separator = ('-' * 50) + '\n'
+        sys.stderr.write(separator)
+        sys.stderr.write('----- Warnings -- count: {} -----\n'.format(
+            len(gds_collector.get_messages()), ))
+        gds_collector.write_messages(sys.stderr)
+        sys.stderr.write(separator)
+    return rootObj
+
+
+def parseEtree(inFileName, silence=False, print_warnings=True,
+               mapping=None, reverse_mapping=None, nsmap=None):
+    parser = None
+    doc = parsexml_(inFileName, parser)
+    gds_collector = GdsCollector_()
+    rootNode = doc.getroot()
+    rootTag, rootClass = get_root_tag(rootNode)
+    if rootClass is None:
+        rootTag = 'StyledLayerDescriptor'
+        rootClass = StyledLayerDescriptor
+    rootObj = rootClass.factory()
+    rootObj.build(rootNode, gds_collector_=gds_collector)
+    if mapping is None:
+        mapping = {}
+    if reverse_mapping is None:
+        reverse_mapping = {}
+    rootElement = rootObj.to_etree(
+        None, name_=rootTag, mapping_=mapping,
+        reverse_mapping_=reverse_mapping, nsmap_=nsmap)
+    reverse_node_mapping = rootObj.gds_reverse_node_mapping(mapping)
+    # Enable Python to collect the space used by the DOM.
+    if not SaveElementTreeNode:
+        doc = None
+        rootNode = None
+    if not silence:
+        content = etree_.tostring(
+            rootElement, pretty_print=True,
+            xml_declaration=True, encoding="utf-8")
+        sys.stdout.write(str(content))
+        sys.stdout.write('\n')
+    if print_warnings and len(gds_collector.get_messages()) > 0:
+        separator = ('-' * 50) + '\n'
+        sys.stderr.write(separator)
+        sys.stderr.write('----- Warnings -- count: {} -----\n'.format(
+            len(gds_collector.get_messages()), ))
+        gds_collector.write_messages(sys.stderr)
+        sys.stderr.write(separator)
+    return rootObj, rootElement, mapping, reverse_node_mapping
+
+
+def parseString(inString, silence=False, print_warnings=True):
+    '''Parse a string, create the object tree, and export it.
+
+    Arguments:
+    - inString -- A string.  This XML fragment should not start
+      with an XML declaration containing an encoding.
+    - silence -- A boolean.  If False, export the object.
+    Returns -- The root object in the tree.
+    '''
+    parser = None
+    rootNode= parsexmlstring_(inString, parser)
+    gds_collector = GdsCollector_()
+    rootTag, rootClass = get_root_tag(rootNode)
+    if rootClass is None:
+        rootTag = 'StyledLayerDescriptor'
+        rootClass = StyledLayerDescriptor
+    rootObj = rootClass.factory()
+    rootObj.build(rootNode, gds_collector_=gds_collector)
+    if not SaveElementTreeNode:
+        rootNode = None
+    if not silence:
+        sys.stdout.write('<?xml version="1.0" ?>\n')
+        rootObj.export(
+            sys.stdout, 0, name_=rootTag,
+            namespacedef_='xmlns:sld="http://www.opengis.net/sld"')
+    if print_warnings and len(gds_collector.get_messages()) > 0:
+        separator = ('-' * 50) + '\n'
+        sys.stderr.write(separator)
+        sys.stderr.write('----- Warnings -- count: {} -----\n'.format(
+            len(gds_collector.get_messages()), ))
+        gds_collector.write_messages(sys.stderr)
+        sys.stderr.write(separator)
+    return rootObj
+
+
+def parseLiteral(inFileName, silence=False, print_warnings=True):
+    parser = None
+    doc = parsexml_(inFileName, parser)
+    gds_collector = GdsCollector_()
+    rootNode = doc.getroot()
+    rootTag, rootClass = get_root_tag(rootNode)
+    if rootClass is None:
+        rootTag = 'StyledLayerDescriptor'
+        rootClass = StyledLayerDescriptor
+    rootObj = rootClass.factory()
+    rootObj.build(rootNode, gds_collector_=gds_collector)
+    # Enable Python to collect the space used by the DOM.
+    if not SaveElementTreeNode:
+        doc = None
+        rootNode = None
+    if not silence:
+        sys.stdout.write('#from sld import *\n\n')
+        sys.stdout.write('import sld as model_\n\n')
+        sys.stdout.write('rootObj = model_.rootClass(\n')
+        rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
+        sys.stdout.write(')\n')
+    if print_warnings and len(gds_collector.get_messages()) > 0:
+        separator = ('-' * 50) + '\n'
+        sys.stderr.write(separator)
+        sys.stderr.write('----- Warnings -- count: {} -----\n'.format(
+            len(gds_collector.get_messages()), ))
+        gds_collector.write_messages(sys.stderr)
+        sys.stderr.write(separator)
+    return rootObj
+
+
+def main():
+    args = sys.argv[1:]
+    if len(args) == 1:
+        parse(args[0])
+    else:
+        usage()
+
+
+if __name__ == '__main__':
+    #import pdb; pdb.set_trace()
+    main()
+
+RenameMappings_ = {
+}
+
+#
+# Mapping of namespaces to types defined in them
+# and the file in which each is defined.
+# simpleTypes are marked "ST" and complexTypes "CT".
+NamespaceToDefMappings_ = {'http://www.opengis.net/gml': [('AbstractGeometryType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('AbstractGeometryCollectionBaseType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('GeometryAssociationType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('PointMemberType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('LineStringMemberType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('PolygonMemberType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('LinearRingMemberType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('PointType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('LineStringType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('LinearRingType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('BoxType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('PolygonType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('GeometryCollectionType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('MultiPointType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('MultiLineStringType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('MultiPolygonType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('CoordType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('CoordinatesType',
+                                 'http://schemas.opengis.net/gml/2.1.2/geometry.xsd',
+                                 'CT'),
+                                ('NullType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'ST'),
+                                ('AbstractFeatureType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('AbstractFeatureCollectionBaseType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('AbstractFeatureCollectionType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('GeometryPropertyType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('FeatureAssociationType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('BoundingShapeType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('PointPropertyType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('PolygonPropertyType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('LineStringPropertyType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('MultiPointPropertyType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('MultiLineStringPropertyType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('MultiPolygonPropertyType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT'),
+                                ('MultiGeometryPropertyType',
+                                 'http://schemas.opengis.net/gml/2.1.2/feature.xsd',
+                                 'CT')],
+ 'http://www.opengis.net/ogc': [('ExpressionType',
+                                 'http://schemas.opengis.net/filter/1.0.0/expr.xsd',
+                                 'CT'),
+                                ('BinaryOperatorType',
+                                 'http://schemas.opengis.net/filter/1.0.0/expr.xsd',
+                                 'CT'),
+                                ('FunctionType',
+                                 'http://schemas.opengis.net/filter/1.0.0/expr.xsd',
+                                 'CT'),
+                                ('LiteralType',
+                                 'http://schemas.opengis.net/filter/1.0.0/expr.xsd',
+                                 'CT'),
+                                ('PropertyNameType',
+                                 'http://schemas.opengis.net/filter/1.0.0/expr.xsd',
+                                 'CT'),
+                                ('ComparisonOpsType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('SpatialOpsType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('LogicOpsType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('FilterType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('FeatureIdType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('BinaryComparisonOpType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('PropertyIsLikeType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('PropertyIsNullType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('PropertyIsBetweenType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('LowerBoundaryType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('UpperBoundaryType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('BinarySpatialOpType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('BBOXType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('DistanceBufferType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('DistanceType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('BinaryLogicOpType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT'),
+                                ('UnaryLogicOpType',
+                                 'http://schemas.opengis.net/filter/1.0.0/filter.xsd',
+                                 'CT')],
+ 'http://www.opengis.net/sld': [('SymbolizerType',
+                                 'StyledLayerDescriptor.xsd',
+                                 'CT'),
+                                ('ParameterValueType',
+                                 'StyledLayerDescriptor.xsd',
+                                 'CT'),
+                                ('SelectedChannelType',
+                                 'StyledLayerDescriptor.xsd',
+                                 'CT')],
+ 'http://www.w3.org/1999/xlink': [('typeType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('hrefType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('roleType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('arcroleType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('titleAttrType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('showType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('actuateType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('labelType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('fromType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('toType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'ST'),
+                                  ('simple',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'CT'),
+                                  ('extended',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'CT'),
+                                  ('titleEltType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'CT'),
+                                  ('resourceType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'CT'),
+                                  ('locatorType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'CT'),
+                                  ('arcType',
+                                   'http://www.w3.org/1999/xlink.xsd',
+                                   'CT')],
+ 'http://www.w3.org/XML/1998/namespace': []}
+
+__all__ = [
+    "AVERAGE",
+    "AbstractFeatureCollectionBaseType",
+    "AbstractFeatureCollectionType",
+    "AbstractFeatureType",
+    "AbstractGeometryCollectionBaseType",
+    "AbstractGeometryType",
+    "AnchorPoint",
+    "BBOXType",
+    "BinaryComparisonOpType",
+    "BinaryLogicOpType",
+    "BinaryOperatorType",
+    "BinarySpatialOpType",
+    "BoundingShapeType",
+    "BoxType",
+    "ChannelSelection",
+    "ColorMap",
+    "ColorMapEntry",
+    "ComparisonOpsType",
+    "ContrastEnhancement",
+    "CoordType",
+    "CoordinatesType",
+    "CssParameter",
+    "Displacement",
+    "DistanceBufferType",
+    "DistanceType",
+    "EARLIEST_ON_TOP",
+    "ElseFilter",
+    "ExpressionType",
+    "Extent",
+    "ExternalGraphic",
+    "FeatureAssociationType",
+    "FeatureIdType",
+    "FeatureTypeConstraint",
+    "FeatureTypeStyle",
+    "Fill",
+    "FilterType",
+    "Font",
+    "FunctionType",
+    "Geometry",
+    "GeometryAssociationType",
+    "GeometryCollectionType",
+    "GeometryPropertyType",
+    "Graphic",
+    "GraphicFill",
+    "GraphicStroke",
+    "Halo",
+    "Histogram",
+    "ImageOutline",
+    "LATEST_ON_TOP",
+    "LabelPlacement",
+    "LayerFeatureConstraints",
+    "LegendGraphic",
+    "LinePlacement",
+    "LineStringMemberType",
+    "LineStringPropertyType",
+    "LineStringType",
+    "LineSymbolizer",
+    "LinearRingMemberType",
+    "LinearRingType",
+    "LiteralType",
+    "LogicOpsType",
+    "LowerBoundaryType",
+    "Mark",
+    "MultiGeometryPropertyType",
+    "MultiLineStringPropertyType",
+    "MultiLineStringType",
+    "MultiPointPropertyType",
+    "MultiPointType",
+    "MultiPolygonPropertyType",
+    "MultiPolygonType",
+    "NamedLayer",
+    "NamedStyle",
+    "Normalize",
+    "OnlineResource",
+    "OverlapBehavior",
+    "ParameterValueType",
+    "PointMemberType",
+    "PointPlacement",
+    "PointPropertyType",
+    "PointSymbolizer",
+    "PointType",
+    "PolygonMemberType",
+    "PolygonPropertyType",
+    "PolygonSymbolizer",
+    "PolygonType",
+    "PropertyIsBetweenType",
+    "PropertyIsLikeType",
+    "PropertyIsNullType",
+    "PropertyNameType",
+    "RANDOM",
+    "RasterSymbolizer",
+    "RemoteOWS",
+    "Rule",
+    "SelectedChannelType",
+    "Service",
+    "ShadedRelief",
+    "SpatialOpsType",
+    "Stroke",
+    "StyledLayerDescriptor",
+    "SymbolizerType",
+    "TextSymbolizer",
+    "UnaryLogicOpType",
+    "UpperBoundaryType",
+    "UserLayer",
+    "UserStyle",
+    "arcType",
+    "extended",
+    "locatorType",
+    "resourceType",
+    "simple",
+    "titleEltType"
+]
